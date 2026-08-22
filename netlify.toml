@@ -1,0 +1,10 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+# SPA Fallback rule so React Router deep links work
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
