@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import Modal from '../../components/ui/Modal';
 import {
   Sparkles,
   Mail,
@@ -16,7 +15,6 @@ import {
   X,
   UserPlus,
   KeyRound,
-  HelpCircle,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -106,7 +104,7 @@ export const Login = () => {
       role: customGoogleEmail.toLowerCase().includes('admin') ? 'admin' : 'employee',
       department: 'Engineering',
       title: 'Member of Technical Staff',
-      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=6366F1&color=fff`,
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=0284C7&color=fff`,
     });
   };
 
@@ -160,11 +158,11 @@ export const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#090D16',
+        backgroundColor: '#000000',
         padding: '1.5rem',
         backgroundImage: `
-          radial-gradient(ellipse 60% 40% at 50% 0%, rgba(99, 102, 241, 0.2), transparent),
-          radial-gradient(ellipse 50% 30% at 80% 80%, rgba(6, 182, 212, 0.12), transparent)
+          radial-gradient(ellipse 60% 40% at 50% 0%, rgba(56, 189, 248, 0.12), transparent),
+          radial-gradient(ellipse 50% 30% at 80% 80%, rgba(6, 182, 212, 0.08), transparent)
         `,
       }}
     >
@@ -176,12 +174,12 @@ export const Login = () => {
               width: '52px',
               height: '52px',
               borderRadius: '16px',
-              background: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)',
+              background: 'linear-gradient(135deg, #0284C7 0%, #06B6D4 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FFFFFF',
-              boxShadow: '0 0 30px rgba(99, 102, 241, 0.4)',
+              boxShadow: '0 0 30px rgba(2, 132, 199, 0.4)',
               marginBottom: '1rem',
             }}
           >
@@ -191,7 +189,7 @@ export const Login = () => {
             className="text-3xl font-black text-primary"
             style={{
               letterSpacing: '-0.04em',
-              background: 'linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 100%)',
+              background: 'linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -209,12 +207,12 @@ export const Login = () => {
         {/* Login Card */}
         <div
           style={{
-            backgroundColor: 'rgba(17, 24, 39, 0.85)',
+            backgroundColor: 'rgba(10, 10, 15, 0.95)',
             backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '18px',
             padding: '2rem',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
           }}
         >
           {/* Google 1-Click Sign-In Button */}
@@ -269,11 +267,11 @@ export const Login = () => {
               margin: '1.25rem 0',
             }}
           >
-            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
             <span className="text-xs text-muted" style={{ textTransform: 'uppercase', fontSize: '0.6875rem' }}>
               Or choose demo persona
             </span>
-            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+            <div style={{ flex: 1, height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.08)' }} />
           </div>
 
           {/* Quick Demo Persona Switcher */}
@@ -288,9 +286,9 @@ export const Login = () => {
                   gap: '0.25rem',
                   padding: '0.625rem 0.5rem',
                   borderRadius: '10px',
-                  border: `1px solid ${selectedRole === 'admin' ? '#6366F1' : 'rgba(255, 255, 255, 0.08)'}`,
+                  border: `1px solid ${selectedRole === 'admin' ? '#38BDF8' : 'rgba(255, 255, 255, 0.08)'}`,
                   backgroundColor:
-                    selectedRole === 'admin' ? 'rgba(99, 102, 241, 0.18)' : 'rgba(15, 23, 42, 0.6)',
+                    selectedRole === 'admin' ? 'rgba(56, 189, 248, 0.12)' : 'rgba(16, 16, 23, 0.8)',
                   color: selectedRole === 'admin' ? '#FFFFFF' : '#94A3B8',
                   cursor: 'pointer',
                   textAlign: 'center',
@@ -298,7 +296,7 @@ export const Login = () => {
                 }}
               >
                 <div className="flex items-center justify-center gap-1">
-                  <ShieldCheck size={14} style={{ color: '#818CF8' }} />
+                  <ShieldCheck size={14} style={{ color: '#38BDF8' }} />
                   <span className="text-xs font-bold text-primary" style={{ fontSize: '0.6875rem' }}>
                     Saksham
                   </span>
@@ -320,8 +318,8 @@ export const Login = () => {
                   border: `1px solid ${selectedRole === 'employee' && email.includes('alex') ? '#06B6D4' : 'rgba(255, 255, 255, 0.08)'}`,
                   backgroundColor:
                     selectedRole === 'employee' && email.includes('alex')
-                      ? 'rgba(6, 182, 212, 0.18)'
-                      : 'rgba(15, 23, 42, 0.6)',
+                      ? 'rgba(6, 182, 212, 0.15)'
+                      : 'rgba(16, 16, 23, 0.8)',
                   color: '#FFFFFF',
                   cursor: 'pointer',
                   textAlign: 'center',
@@ -350,8 +348,8 @@ export const Login = () => {
                   borderRadius: '10px',
                   border: `1px solid ${email.includes('priya') ? '#10B981' : 'rgba(255, 255, 255, 0.08)'}`,
                   backgroundColor: email.includes('priya')
-                    ? 'rgba(16, 185, 129, 0.18)'
-                    : 'rgba(15, 23, 42, 0.6)',
+                    ? 'rgba(16, 185, 129, 0.15)'
+                    : 'rgba(16, 16, 23, 0.8)',
                   color: '#FFFFFF',
                   cursor: 'pointer',
                   textAlign: 'center',
@@ -399,8 +397,8 @@ export const Login = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: '#060609',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '10px',
                   padding: '0.625rem 0.875rem',
                 }}
@@ -453,8 +451,8 @@ export const Login = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  backgroundColor: 'rgba(15, 23, 42, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  backgroundColor: '#060609',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '10px',
                   padding: '0.625rem 0.875rem',
                 }}
@@ -504,14 +502,14 @@ export const Login = () => {
                 gap: '0.5rem',
                 padding: '0.75rem 1.25rem',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
                 color: '#FFFFFF',
                 fontSize: '0.875rem',
                 fontWeight: 700,
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1,
-                boxShadow: '0 4px 20px rgba(99, 102, 241, 0.4)',
+                boxShadow: '0 4px 20px rgba(2, 132, 199, 0.4)',
                 transition: 'all 150ms ease',
               }}
             >
@@ -548,7 +546,7 @@ export const Login = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
             backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
@@ -562,11 +560,12 @@ export const Login = () => {
             style={{
               width: '100%',
               maxWidth: '400px',
-              backgroundColor: '#FFFFFF',
-              color: '#1F2937',
+              backgroundColor: '#0A0A0F',
+              color: '#F8FAFC',
               borderRadius: '16px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               padding: '1.5rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9)',
             }}
           >
             {/* Modal Header */}
@@ -590,7 +589,7 @@ export const Login = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <h3 className="text-base font-bold" style={{ color: '#111827' }}>
+                <h3 className="text-base font-bold text-primary">
                   Sign in with Google
                 </h3>
               </div>
@@ -600,7 +599,7 @@ export const Login = () => {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#6B7280',
+                  color: '#64748B',
                   cursor: 'pointer',
                   padding: '4px',
                 }}
@@ -609,7 +608,7 @@ export const Login = () => {
               </button>
             </div>
 
-            <p className="text-xs text-gray-500" style={{ marginBottom: '1rem', lineHeight: 1.4 }}>
+            <p className="text-xs text-muted" style={{ marginBottom: '1rem', lineHeight: 1.4 }}>
               Choose an account to continue to <strong>DayFlow Workforce OS</strong>:
             </p>
 
@@ -627,16 +626,16 @@ export const Login = () => {
                     gap: '0.875rem',
                     padding: '0.75rem',
                     borderRadius: '10px',
-                    border: '1px solid #E5E7EB',
-                    backgroundColor: signingGoogleUser === acc.email ? '#EEF2FF' : '#F9FAFB',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    backgroundColor: signingGoogleUser === acc.email ? 'rgba(56, 189, 248, 0.15)' : '#111116',
                     cursor: 'pointer',
                     textAlign: 'left',
                     transition: 'all 150ms ease',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F3F4F6')}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#181820')}
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.backgroundColor =
-                      signingGoogleUser === acc.email ? '#EEF2FF' : '#F9FAFB')
+                      signingGoogleUser === acc.email ? 'rgba(56, 189, 248, 0.15)' : '#111116')
                   }
                 >
                   <img
@@ -651,7 +650,7 @@ export const Login = () => {
                   />
                   <div style={{ flex: 1 }}>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold" style={{ color: '#111827' }}>
+                      <span className="text-xs font-bold text-primary">
                         {acc.name}
                       </span>
                       <span
@@ -659,22 +658,22 @@ export const Login = () => {
                           fontSize: '0.625rem',
                           padding: '0.125rem 0.375rem',
                           borderRadius: '999px',
-                          backgroundColor: acc.role === 'admin' ? '#E0E7FF' : '#E0F2FE',
-                          color: acc.role === 'admin' ? '#4338CA' : '#0369A1',
+                          backgroundColor: acc.role === 'admin' ? 'rgba(56, 189, 248, 0.2)' : 'rgba(6, 182, 212, 0.2)',
+                          color: acc.role === 'admin' ? '#38BDF8' : '#22D3EE',
                           fontWeight: 700,
                         }}
                       >
                         {acc.role === 'admin' ? 'Admin' : 'Employee'}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-500" style={{ fontSize: '0.75rem' }}>
+                    <span className="text-xs text-muted" style={{ fontSize: '0.75rem' }}>
                       {acc.email}
                     </span>
                   </div>
                   {signingGoogleUser === acc.email && (
                     <div
                       className="pulse-indicator"
-                      style={{ width: '8px', height: '8px', backgroundColor: '#4F46E5' }}
+                      style={{ width: '8px', height: '8px', backgroundColor: '#38BDF8' }}
                     />
                   )}
                 </button>
@@ -695,11 +694,12 @@ export const Login = () => {
                     width: '100%',
                     padding: '0.625rem 0.875rem',
                     borderRadius: '8px',
-                    border: '1px solid #D1D5DB',
+                    backgroundColor: '#060609',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
                     fontSize: '0.8125rem',
                     outline: 'none',
                     marginBottom: '0.5rem',
-                    color: '#111827',
+                    color: '#F8FAFC',
                   }}
                 />
                 <button
@@ -708,7 +708,7 @@ export const Login = () => {
                     width: '100%',
                     padding: '0.5rem',
                     borderRadius: '8px',
-                    backgroundColor: '#4F46E5',
+                    backgroundColor: '#0284C7',
                     color: '#FFFFFF',
                     border: 'none',
                     fontWeight: 600,
@@ -731,9 +731,9 @@ export const Login = () => {
                   gap: '0.5rem',
                   padding: '0.625rem',
                   borderRadius: '8px',
-                  border: '1px dashed #D1D5DB',
+                  border: '1px dashed rgba(255, 255, 255, 0.15)',
                   background: 'none',
-                  color: '#4B5563',
+                  color: '#94A3B8',
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -753,7 +753,7 @@ export const Login = () => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
             backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
@@ -767,12 +767,12 @@ export const Login = () => {
             style={{
               width: '100%',
               maxWidth: '420px',
-              backgroundColor: '#111827',
+              backgroundColor: '#0A0A0F',
               color: '#F8FAFC',
               borderRadius: '16px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               padding: '1.75rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.9)',
             }}
           >
             <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
@@ -828,7 +828,7 @@ export const Login = () => {
                       width: '100%',
                       padding: '0.625rem 0.875rem',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      backgroundColor: '#060609',
                       border: '1px solid rgba(255, 255, 255, 0.12)',
                       color: '#F8FAFC',
                       fontSize: '0.8125rem',
@@ -851,7 +851,7 @@ export const Login = () => {
                       width: '100%',
                       padding: '0.625rem 0.875rem',
                       borderRadius: '8px',
-                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      backgroundColor: '#060609',
                       border: '1px solid rgba(255, 255, 255, 0.12)',
                       color: '#F8FAFC',
                       fontSize: '0.8125rem',
@@ -867,7 +867,7 @@ export const Login = () => {
                     marginTop: '0.75rem',
                     padding: '0.75rem',
                     borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                    background: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
                     color: '#FFFFFF',
                     fontSize: '0.8125rem',
                     fontWeight: 700,

@@ -1,17 +1,17 @@
 :root {
-  /* Core Obsidian Dark Theme Palette */
-  --bg: #090D16;
-  --bg-canvas: #090D16;
-  --surface: #111827;
-  --bg-surface: #111827;
-  --surface-secondary: #162032;
-  --bg-surface-elevated: #1E293B;
+  /* True Deep Jet Black & Obsidian Theme Palette */
+  --bg: #000000;
+  --bg-canvas: #040407;
+  --surface: #0A0A0F;
+  --bg-surface: #0A0A0F;
+  --surface-secondary: #101017;
+  --bg-surface-elevated: #16161F;
   
-  /* Primary & Accents */
-  --primary: #6366F1;
-  --primary-hover: #4F46E5;
-  --primary-soft: rgba(99, 102, 241, 0.15);
-  --primary-bg: rgba(99, 102, 241, 0.15);
+  /* Primary & Accents (High-Tech Electric Cyan & Pure White) */
+  --primary: #38BDF8;
+  --primary-hover: #0EA5E9;
+  --primary-soft: rgba(56, 189, 248, 0.12);
+  --primary-bg: rgba(56, 189, 248, 0.12);
   
   --pulse-cyan: #06B6D4;
   --pulse-cyan-bg: rgba(6, 182, 212, 0.15);
@@ -21,12 +21,12 @@
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
   --text-muted: #64748B;
-  --text-inverse: #090D16;
+  --text-inverse: #000000;
   
-  /* Borders */
-  --border: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.18);
+  /* Borders (Clean crisp dark borders) */
+  --border: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.16);
   
   /* Statuses */
   --success: #10B981;
@@ -43,10 +43,10 @@
   --danger-bg: rgba(239, 68, 68, 0.15);
   --rose: #F43F5E;
   
-  --info: #3B82F6;
-  --info-soft: rgba(59, 130, 246, 0.15);
-  --info-bg: rgba(59, 130, 246, 0.15);
-  --indigo: #818CF8;
+  --info: #38BDF8;
+  --info-soft: rgba(56, 189, 248, 0.15);
+  --info-bg: rgba(56, 189, 248, 0.15);
+  --indigo: #38BDF8;
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -66,11 +66,11 @@
   --radius-full: 9999px;
 
   /* Shadows & Glows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
-  --shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.9);
+  --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
+  --shadow-glow-cyan: 0 0 25px rgba(6, 182, 212, 0.2);
 
   /* Spacing */
   --space-1: 4px;
@@ -97,10 +97,10 @@ body.light-theme {
   --surface-secondary: #F8FAFC;
   --bg-surface-elevated: #FFFFFF;
 
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --primary-soft: rgba(79, 70, 229, 0.1);
-  --primary-bg: rgba(79, 70, 229, 0.08);
+  --primary: #0284C7;
+  --primary-hover: #0369A1;
+  --primary-soft: rgba(2, 132, 199, 0.1);
+  --primary-bg: rgba(2, 132, 199, 0.08);
 
   --pulse-cyan: #0891B2;
   --pulse-cyan-bg: rgba(8, 145, 178, 0.1);
@@ -118,6 +118,6 @@ body.light-theme {
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+  --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.15);
   --shadow-glow-cyan: 0 0 20px rgba(8, 145, 178, 0.15);
 }

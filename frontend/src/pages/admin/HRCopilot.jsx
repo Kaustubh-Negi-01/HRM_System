@@ -84,9 +84,9 @@ export const HRCopilot = () => {
           flexDirection: 'column',
           overflow: 'hidden',
           borderRadius: 'var(--radius-xl)',
-          border: '1px solid rgba(99, 102, 241, 0.3)',
-          background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 15, 25, 0.98) 100%)',
-          boxShadow: 'var(--shadow-glow)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'linear-gradient(180deg, rgba(10, 10, 15, 0.98) 0%, rgba(5, 5, 8, 0.99) 100%)',
+          boxShadow: 'var(--shadow-lg)',
         }}
       >
         {/* Chat Messages Log */}
@@ -118,13 +118,13 @@ export const HRCopilot = () => {
                       width: '36px',
                       height: '36px',
                       borderRadius: 'var(--radius-md)',
-                      background: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)',
+                      background: 'linear-gradient(135deg, #0284C7 0%, #06B6D4 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: '#FFFFFF',
                       flexShrink: 0,
-                      boxShadow: '0 0 12px rgba(99, 102, 241, 0.4)',
+                      boxShadow: '0 0 12px rgba(6, 182, 212, 0.3)',
                     }}
                   >
                     <Bot size={20} />
@@ -136,16 +136,16 @@ export const HRCopilot = () => {
                     maxWidth: isUser ? '70%' : '80%',
                     padding: '1rem 1.25rem',
                     borderRadius: 'var(--radius-lg)',
-                    backgroundColor: isUser ? 'var(--primary)' : 'rgba(30, 41, 59, 0.7)',
-                    border: isUser ? 'none' : '1px solid var(--border-subtle)',
-                    color: '#FFFFFF',
+                    backgroundColor: isUser ? 'var(--primary)' : 'rgba(16, 16, 23, 0.9)',
+                    border: isUser ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+                    color: isUser ? '#000000' : '#FFFFFF',
                   }}
                 >
                   <div className="flex items-center justify-between gap-4" style={{ marginBottom: '0.25rem' }}>
-                    <span className="text-xs font-bold" style={{ opacity: 0.8 }}>
+                    <span className="text-xs font-bold" style={{ opacity: 0.9 }}>
                       {isUser ? 'You' : 'DayFlow Copilot'}
                     </span>
-                    <span className="text-xs" style={{ opacity: 0.5, fontSize: '0.6875rem' }}>
+                    <span className="text-xs" style={{ opacity: 0.6, fontSize: '0.6875rem' }}>
                       {msg.timestamp}
                     </span>
                   </div>
@@ -157,6 +157,7 @@ export const HRCopilot = () => {
                       lineHeight: 1.6,
                       whiteSpace: 'pre-wrap',
                       marginTop: '0.25rem',
+                      fontWeight: isUser ? 600 : 400,
                     }}
                   >
                     {msg.content || msg.answer || (typeof msg === 'string' ? msg : '')}
@@ -169,13 +170,13 @@ export const HRCopilot = () => {
                         marginTop: '1rem',
                         overflowX: 'auto',
                         borderRadius: 'var(--radius-md)',
-                        border: '1px solid var(--border-subtle)',
-                        backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        backgroundColor: 'rgba(5, 5, 8, 0.8)',
                       }}
                     >
                       <table style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse' }}>
                         <thead>
-                          <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                          <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
                             {msg.dataTable.headers.map((h, i) => (
                               <th key={i} style={{ padding: '0.5rem 0.75rem', textAlign: 'left', color: 'var(--text-secondary)' }}>
                                 {h}
@@ -185,7 +186,7 @@ export const HRCopilot = () => {
                         </thead>
                         <tbody>
                           {msg.dataTable.rows.map((row, rIdx) => (
-                            <tr key={rIdx} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            <tr key={rIdx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                               {(Array.isArray(row) ? row : [row]).map((cell, cIdx) => (
                                 <td key={cIdx} style={{ padding: '0.5rem 0.75rem', color: 'var(--text-primary)' }}>
                                   {cell}
@@ -242,7 +243,7 @@ export const HRCopilot = () => {
                   width: '36px',
                   height: '36px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)',
+                  background: 'linear-gradient(135deg, #0284C7 0%, #06B6D4 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -256,8 +257,8 @@ export const HRCopilot = () => {
                 style={{
                   padding: '0.875rem 1.25rem',
                   borderRadius: 'var(--radius-lg)',
-                  backgroundColor: 'rgba(30, 41, 59, 0.7)',
-                  border: '1px solid var(--border-subtle)',
+                  backgroundColor: 'rgba(16, 16, 23, 0.8)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
@@ -265,7 +266,7 @@ export const HRCopilot = () => {
                   fontSize: '0.875rem',
                 }}
               >
-                <div className="pulse-indicator" style={{ width: '8px', height: '8px' }} />
+                <div className="pulse-indicator" style={{ width: '8px', height: '8px', backgroundColor: '#38BDF8' }} />
                 <span>DayFlow Copilot is synthesizing workforce telemetry...</span>
               </div>
             </div>
@@ -279,8 +280,8 @@ export const HRCopilot = () => {
           <div
             style={{
               padding: '0.75rem 2rem',
-              borderTop: '1px solid var(--border-subtle)',
-              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: 'rgba(6, 6, 9, 0.9)',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
@@ -288,7 +289,7 @@ export const HRCopilot = () => {
             }}
           >
             <span className="text-xs font-bold text-muted flex items-center gap-1" style={{ whiteSpace: 'nowrap' }}>
-              <Zap size={12} style={{ color: 'var(--pulse-cyan)' }} /> Suggested:
+              <Zap size={12} style={{ color: 'var(--primary)' }} /> Suggested:
             </span>
             {suggestedPrompts.map((p, idx) => (
               <button
@@ -298,9 +299,9 @@ export const HRCopilot = () => {
                 style={{
                   padding: '0.35rem 0.75rem',
                   borderRadius: 'var(--radius-full)',
-                  backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                  border: '1px solid rgba(99, 102, 241, 0.25)',
-                  color: '#A5B4FC',
+                  backgroundColor: 'rgba(56, 189, 248, 0.08)',
+                  border: '1px solid rgba(56, 189, 248, 0.2)',
+                  color: '#38BDF8',
                   fontSize: '0.75rem',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',
@@ -317,8 +318,8 @@ export const HRCopilot = () => {
         <div
           style={{
             padding: '1.25rem 2rem',
-            borderTop: '1px solid var(--border-subtle)',
-            backgroundColor: 'rgba(15, 23, 42, 0.8)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            backgroundColor: 'rgba(6, 6, 9, 0.95)',
           }}
         >
           <form
@@ -337,8 +338,8 @@ export const HRCopilot = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem 1.25rem',
-                  backgroundColor: 'rgba(30, 41, 59, 0.6)',
-                  border: '1px solid var(--border)',
+                  backgroundColor: '#000000',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: 'var(--radius-lg)',
                   color: '#F8FAFC',
                   fontSize: '0.875rem',
