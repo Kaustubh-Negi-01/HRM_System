@@ -6,11 +6,10 @@
 
 **An intelligent, proactive Human Resource Management & Decision-Support System with Real-Time Staffing Intelligence, AI Copilot, and Departmental Budget Planning.**
 
-### 🚀 **[Live Production Deployment (Vercel)](https://humanresourcemanagement-theta.vercel.app)**
-👉 **Direct Admin Portal**: **[https://humanresourcemanagement-theta.vercel.app/admin](https://humanresourcemanagement-theta.vercel.app/admin)**  
-👉 **Direct Employee Portal**: **[https://humanresourcemanagement-theta.vercel.app/employee](https://humanresourcemanagement-theta.vercel.app/employee)**
+### 🚀 **[Live Web App (Login)](https://humanresourcemanagement-theta.vercel.app/login)**
+👉 **Production URL**: **[https://humanresourcemanagement-theta.vercel.app](https://humanresourcemanagement-theta.vercel.app)**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel_Production-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://humanresourcemanagement-theta.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Login_Portal-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://humanresourcemanagement-theta.vercel.app/login)
 [![Repository](https://img.shields.io/badge/GitHub-saksham--2x7%2Fhumanresourcemanagement-38BDF8?style=for-the-badge&logo=github)](https://github.com/saksham-2x7/humanresourcemanagement)
 [![Database](https://img.shields.io/badge/Supabase-Cloud_PostgreSQL-10B981?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![AI Engine](https://img.shields.io/badge/Google_Gemini-HR_Copilot-0284C7?style=for-the-badge&logo=google)](https://ai.google.dev)
@@ -102,9 +101,9 @@ Real-time employee execution and attendance console:
 
 | Role | Name | Email | Default Password | Workspace Route |
 |---|---|---|---|---|
-| **Admin / HR Director** | Saksham Singh | `admin@dayflow.internal` | `Password123!` | [`/admin`](https://humanresourcemanagement-theta.vercel.app/admin) |
-| **Lead Engineer** | Alex Chen | `alex.chen@dayflow.internal` | `Password123!` | [`/employee`](https://humanresourcemanagement-theta.vercel.app/employee) |
-| **Support Manager** | Priya Sharma | `priya.sharma@dayflow.internal` | `Password123!` | [`/employee`](https://humanresourcemanagement-theta.vercel.app/employee) |
+| **Admin / HR Director** | Saksham Singh | `admin@dayflow.internal` | `Password123!` | Admin Command Center |
+| **Lead Engineer** | Alex Chen | `alex.chen@dayflow.internal` | `Password123!` | Employee Portal |
+| **Support Manager** | Priya Sharma | `priya.sharma@dayflow.internal` | `Password123!` | Employee Portal |
 
 *(You can also click **"Continue with Google"** on the login page for instant 1-click access!)*
 
