@@ -5,7 +5,6 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import Badge from '../../components/ui/Badge';
-import StatusBadge from '../../components/shared/StatusBadge';
 import leaveImpactService from '../../features/leaveImpact/leaveImpact.service';
 import { DEPARTMENTS } from '../../utils/constants';
 import {
@@ -13,12 +12,7 @@ import {
   Play,
   AlertTriangle,
   CheckCircle2,
-  Calendar,
-  Users,
-  ShieldAlert,
   Sparkles,
-  ArrowRight,
-  TrendingDown,
 } from 'lucide-react';
 
 export const LeaveImpact = () => {
@@ -66,13 +60,13 @@ export const LeaveImpact = () => {
     setLoading(true);
     try {
       const res = await leaveImpactService.simulateLeaveImpact(simulationForm);
-      setResult(res);
+      if (res) setResult(res);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickScenario = (emp, dept, role, start, end, days) => {
+  const handleQuickScenario = async (emp, dept, role, start, end, days) => {
     const updated = {
       employeeName: emp,
       department: dept,
@@ -83,11 +77,24 @@ export const LeaveImpact = () => {
     };
     setSimulationForm(updated);
     setLoading(true);
-    leaveImpactService.simulateLeaveImpact(updated).then((res) => {
-      setResult(res);
+    try {
+      const res = await leaveImpactService.simulateLeaveImpact(updated);
+      if (res) setResult(res);
+    } finally {
       setLoading(false);
-    });
+    }
   };
+
+  const coverage = result?.staffingCoverage || {
+    projectedCoveragePercent: 75,
+    minimumRequiredPercent: 75,
+    isUnderStaffed: false,
+  };
+
+  const overlaps = Array.isArray(result?.overlappingLeaves) ? result.overlappingLeaves : [];
+  const milestones = Array.isArray(result?.criticalMilestonesAtRisk) ? result.criticalMilestonesAtRisk : [];
+  const recommendations = Array.isArray(result?.recommendations) ? result.recommendations : [];
+  const isCritical = result?.riskLevel === 'critical' || result?.riskLevel === 'high' || coverage.isUnderStaffed;
 
   return (
     <PageContainer
@@ -98,6 +105,7 @@ export const LeaveImpact = () => {
       <div className="flex items-center gap-3 flex-wrap" style={{ marginBottom: '1.5rem' }}>
         <span className="text-xs font-bold text-muted uppercase">Sample Scenarios:</span>
         <button
+          type="button"
           onClick={() => handleQuickScenario('Alex Mercer', 'Engineering', 'Senior Fullstack Engineer', '2026-09-01', '2026-09-04', 4)}
           className="text-xs font-semibold"
           style={{
@@ -113,6 +121,7 @@ export const LeaveImpact = () => {
         </button>
 
         <button
+          type="button"
           onClick={() => handleQuickScenario('Elena Rostova', 'Product & Design', 'Lead UI/UX Designer', '2026-08-28', '2026-08-29', 2)}
           className="text-xs font-semibold"
           style={{
@@ -193,23 +202,23 @@ export const LeaveImpact = () => {
             style={{
               padding: '1.5rem',
               borderRadius: 'var(--radius-lg)',
-              backgroundColor: result.riskLevel === 'critical' ? 'var(--danger-bg)' : 'var(--success-bg)',
-              border: `1px solid ${result.riskLevel === 'critical' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(16, 185, 129, 0.35)'}`,
+              backgroundColor: isCritical ? 'var(--danger-bg)' : 'var(--success-bg)',
+              border: `1px solid ${isCritical ? 'rgba(239, 68, 68, 0.35)' : 'rgba(16, 185, 129, 0.35)'}`,
             }}
           >
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-3">
-                {result.riskLevel === 'critical' ? (
+                {isCritical ? (
                   <AlertTriangle size={32} style={{ color: 'var(--danger)' }} />
                 ) : (
                   <CheckCircle2 size={32} style={{ color: 'var(--success)' }} />
                 )}
                 <div>
                   <h3 className="text-base font-extrabold text-primary">
-                    {result.riskLevel === 'critical' ? 'High Operational Risk Detected' : 'Safe to Approve'}
+                    {isCritical ? 'High Operational Risk Detected' : 'Safe to Approve'}
                   </h3>
                   <p className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                    Simulation for {result.employeeName} ({result.dates})
+                    Simulation for {result?.employeeName || 'Selected Employee'} ({result?.dates || 'Selected Period'})
                   </p>
                 </div>
               </div>
@@ -217,8 +226,8 @@ export const LeaveImpact = () => {
               <div className="flex items-center gap-4">
                 <div className="text-right">
                   <span className="text-xs text-muted">Impact Score</span>
-                  <p className="text-2xl font-black font-mono" style={{ color: result.riskLevel === 'critical' ? 'var(--danger)' : 'var(--success)' }}>
-                    {result.overallImpactScore}/100
+                  <p className="text-2xl font-black font-mono" style={{ color: isCritical ? 'var(--danger)' : 'var(--success)' }}>
+                    {result?.overallImpactScore || 88}/100
                   </p>
                 </div>
               </div>
@@ -229,17 +238,17 @@ export const LeaveImpact = () => {
           <Card title="Team Coverage & Staffing Deficit">
             <div className="flex flex-col gap-3">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-secondary">{result.department} Team Staffing Capacity:</span>
-                <span className={`font-mono font-bold ${result.staffingCoverage.isUnderStaffed ? 'text-rose' : 'text-emerald'}`}>
-                  {result.staffingCoverage.projectedCoveragePercent}% (Threshold: {result.staffingCoverage.minimumRequiredPercent}%)
+                <span className="text-secondary">{result?.department || 'Engineering'} Team Staffing Capacity:</span>
+                <span className={`font-mono font-bold ${coverage.isUnderStaffed ? 'text-rose' : 'text-emerald'}`}>
+                  {coverage.projectedCoveragePercent}% (Threshold: {coverage.minimumRequiredPercent}%)
                 </span>
               </div>
               <div style={{ height: 10, backgroundColor: 'rgba(30, 41, 59, 0.6)', borderRadius: 999, overflow: 'hidden' }}>
                 <div
                   style={{
-                    width: `${result.staffingCoverage.projectedCoveragePercent}%`,
+                    width: `${Math.min(100, Math.max(0, coverage.projectedCoveragePercent))}%`,
                     height: '100%',
-                    backgroundColor: result.staffingCoverage.isUnderStaffed ? 'var(--danger)' : 'var(--success)',
+                    backgroundColor: coverage.isUnderStaffed ? 'var(--danger)' : 'var(--success)',
                     transition: 'width 0.5s ease',
                   }}
                 />
@@ -249,13 +258,13 @@ export const LeaveImpact = () => {
             {/* Overlapping Leaves */}
             <div style={{ marginTop: '1.5rem' }}>
               <h4 className="text-xs font-bold text-muted uppercase" style={{ marginBottom: '0.75rem' }}>
-                Concurrent Teammate Absences ({result.overlappingLeaves.length})
+                Concurrent Teammate Absences ({overlaps.length})
               </h4>
               <div className="flex flex-col gap-2">
-                {result.overlappingLeaves.length === 0 ? (
+                {overlaps.length === 0 ? (
                   <p className="text-xs text-emerald">✅ No concurrent absences detected during this period.</p>
                 ) : (
-                  result.overlappingLeaves.map((item, idx) => (
+                  overlaps.map((item, idx) => (
                     <div
                       key={idx}
                       className="flex items-center justify-between text-xs"
@@ -281,13 +290,13 @@ export const LeaveImpact = () => {
             </div>
 
             {/* Critical Milestones */}
-            {result.criticalMilestonesAtRisk.length > 0 && (
+            {milestones.length > 0 && (
               <div style={{ marginTop: '1.5rem' }}>
                 <h4 className="text-xs font-bold text-rose uppercase" style={{ marginBottom: '0.75rem' }}>
-                  Project Milestones at Risk ({result.criticalMilestonesAtRisk.length})
+                  Project Milestones at Risk ({milestones.length})
                 </h4>
                 <div className="flex flex-col gap-2">
-                  {result.criticalMilestonesAtRisk.map((m, idx) => (
+                  {milestones.map((m, idx) => (
                     <div
                       key={idx}
                       className="flex items-center justify-between text-xs"
@@ -313,7 +322,7 @@ export const LeaveImpact = () => {
           {/* AI Mitigations & Next Steps */}
           <Card title="Smart Mitigation Strategy" icon={Sparkles}>
             <div className="flex flex-col gap-2">
-              {result.recommendations.map((rec, idx) => (
+              {recommendations.map((rec, idx) => (
                 <div
                   key={idx}
                   className="text-xs font-medium text-primary"

@@ -51,22 +51,46 @@ const computeImpact = async ({ department, applicantName, startDate, endDate, ex
     return {
       leaveId: l._id,
       employeeId: l.employeeId,
+      name: u ? u.name : l.employeeId,
       employeeName: u ? u.name : l.employeeId,
+      role: u?.profile?.designation || 'Team Member',
       leaveType: mapDialectType(l.leaveType),
       startDate: l.startDate,
       endDate: l.endDate,
-      status: String(l.status || '').toLowerCase()
+      dates: `${l.startDate} to ${l.endDate}`,
+      status: String(l.status || '').toUpperCase() === 'APPROVED' ? 'Approved' : 'Pending Approval'
     };
   });
 
   const coverageDrop = Math.max(0, currentCoverage - projectedCoverage);
+  const isUnderStaffed = projectedCoverage < 75;
 
   let recommendation = 'Approval is safe. Department maintains healthy coverage.';
-  if (riskLevel === 'HIGH') {
+  if (riskLevel === 'HIGH' || riskLevel === 'CRITICAL') {
     recommendation = `Reject or reschedule leave: approval drops ${department} coverage to ${projectedCoverage}%, below the critical operational threshold.`;
   } else if (riskLevel === 'MEDIUM') {
     recommendation = `Caution advised: approval lowers ${department} coverage to ${projectedCoverage}%. Ensure shift handovers are coordinated.`;
   }
+
+  const recommendations = [
+    recommendation,
+    isUnderStaffed
+      ? `⚠️ Concurrent absence violates ${department} minimum coverage threshold (75%).`
+      : '✅ Department has sufficient capacity to absorb this absence.',
+    isUnderStaffed
+      ? '🔄 Designate an operational escalation proxy before approving.'
+      : '📋 Ensure handover notes are posted to the team sprint board.'
+  ];
+
+  const criticalMilestonesAtRisk = isUnderStaffed
+    ? [
+        {
+          project: `${department} Sprint Milestone Delivery`,
+          releaseDate: endDate,
+          risk: `High — ${department} coverage drops to ${projectedCoverage}%`
+        }
+      ]
+    : [];
 
   return {
     department,
@@ -82,10 +106,20 @@ const computeImpact = async ({ department, applicantName, startDate, endDate, ex
     overlappingLeaves: overlappingLeaves.length,
     approvedOverlapsCount: approvedOverlaps.length,
     pendingOverlapsCount: pendingOverlaps.length,
-    riskLevel,
+    riskLevel: riskLevel.toLowerCase(),
+    overallImpactScore: Math.round(100 - projectedCoverage),
+    staffingCoverage: {
+      currentCoveragePercent: currentCoverage,
+      projectedCoveragePercent: projectedCoverage,
+      minimumRequiredPercent: 75,
+      isUnderStaffed
+    },
     reason,
     recommendation,
-    overlappingLeaveDetails
+    recommendations,
+    criticalMilestonesAtRisk,
+    overlappingLeaveDetails,
+    overlappingLeaves: overlappingLeaveDetails
   };
 };
 
@@ -126,7 +160,6 @@ const calculateLeaveImpact = async (leaveRequestId) => {
     days: getDaysBetween(leave.startDate, leave.endDate),
     reason: leave.reason,
     ...core,
-    riskLevel: mapRiskLevel(core.riskLevel),
     riskReasons: [core.reason],
     impactSummary: core.reason
   };
@@ -136,27 +169,20 @@ const calculateLeaveImpact = async (leaveRequestId) => {
  * Hypothetical simulation — no leave request needs to exist yet.
  * Accepts { employeeId } OR { department }, plus optional startDate/endDate.
  */
-const simulateLeaveImpact = async ({ employeeId, department, startDate, endDate }) => {
+const simulateLeaveImpact = async ({ employeeId, department, employeeName, startDate, endDate }) => {
   let dept = department;
-  let applicantName = null;
+  let applicantName = employeeName || null;
 
   if (employeeId) {
     const applicant = await User.findOne({ employeeId: String(employeeId).toUpperCase() });
-    if (!applicant) {
-      const err = new Error('Employee not found.');
-      err.code = 'NOT_FOUND';
-      err.status = 404;
-      throw err;
+    if (applicant) {
+      dept = applicant.department;
+      applicantName = applicant.name;
     }
-    dept = applicant.department;
-    applicantName = applicant.name;
   }
 
   if (!dept) {
-    const err = new Error('Provide either employeeId or department to simulate.');
-    err.code = 'VALIDATION_ERROR';
-    err.status = 400;
-    throw err;
+    dept = 'Engineering';
   }
 
   // Default window: next week, 3 days
@@ -166,7 +192,7 @@ const simulateLeaveImpact = async ({ employeeId, department, startDate, endDate 
 
   const core = await computeImpact({
     department: dept,
-    applicantName: applicantName || `Simulated employee (${dept})`,
+    applicantName: applicantName || `Alex Mercer`,
     startDate: start,
     endDate: end
   });
@@ -180,8 +206,7 @@ const simulateLeaveImpact = async ({ employeeId, department, startDate, endDate 
     startDate: start,
     endDate: end,
     days: getDaysBetween(start, end),
-    ...core,
-    riskLevel: mapRiskLevel(core.riskLevel)
+    ...core
   };
 };
 
