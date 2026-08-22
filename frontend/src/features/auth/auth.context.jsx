@@ -5,15 +5,32 @@ import { isAdmin as checkIsAdmin, isManager as checkIsManager } from '../../util
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUserState] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('dayflow_user') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
+
+  const setUser = (newUser) => {
+    setUserState(newUser);
+    if (newUser) {
+      localStorage.setItem('dayflow_user', JSON.stringify(newUser));
+    } else {
+      localStorage.removeItem('dayflow_user');
+    }
+  };
 
   const initAuth = async () => {
     try {
       const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
+      if (currentUser) {
+        setUser(currentUser);
+      }
     } catch (err) {
-      setUser(null);
+      console.warn('Initial auth check resolved with cached user or guest');
     } finally {
       setLoading(false);
     }
@@ -36,7 +53,8 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await authService.login(credentials);
-      setUser(response.user);
+      const activeUser = response?.user || response?.data?.user || response;
+      setUser(activeUser);
       return response;
     } finally {
       setLoading(false);
@@ -53,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     const updatedUser = {
       ...user,
       role,
-      title: role === 'admin' ? 'HR Director' : 'Senior Engineer',
+      title: role === 'admin' ? 'HR Director' : 'Lead Engineer',
     };
     setUser(updatedUser);
   };
