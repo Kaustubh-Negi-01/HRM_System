@@ -101,7 +101,7 @@ export const Styleguide = () => {
     {
       key: 'employee',
       header: 'Employee',
-      render: (row) => (
+      render: (_, row) => (
         <EmployeeAvatar
           name={row.name}
           subtitle={row.dept}
@@ -115,12 +115,12 @@ export const Styleguide = () => {
     {
       key: 'status',
       header: 'Status',
-      render: (row) => <StatusBadge status={row.status} />,
+      render: (val, row) => <StatusBadge status={val || row.status} />,
     },
     {
       key: 'risk',
       header: 'Staffing Risk',
-      render: (row) => <RiskBadge level={row.risk} size="sm" />,
+      render: (val, row) => <RiskBadge level={val || row.risk} size="sm" />,
     },
     {
       key: 'actions',

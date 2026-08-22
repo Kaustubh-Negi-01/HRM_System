@@ -2,6 +2,16 @@ import React, { useId } from 'react';
 import Field from './Field';
 import './Input.css';
 
+const renderIconProp = (icon) => {
+  if (!icon) return null;
+  if (React.isValidElement(icon)) return icon;
+  if (typeof icon === 'function') {
+    const IconComp = icon;
+    return <IconComp size={16} />;
+  }
+  return icon;
+};
+
 export const Input = React.forwardRef(({
   id: customId,
   label,
@@ -9,6 +19,7 @@ export const Input = React.forwardRef(({
   error,
   required = false,
   prefix,
+  icon,
   suffix,
   size = 'md',
   disabled = false,
@@ -19,10 +30,11 @@ export const Input = React.forwardRef(({
 }, ref) => {
   const generatedId = useId();
   const inputId = customId || (label ? generatedId : undefined);
+  const leadingIcon = prefix || icon;
 
   const inputElement = (
     <div className={`df-input-container df-input-container--${size} ${error ? 'df-input-container--error' : ''} ${disabled ? 'df-input-container--disabled' : ''} ${className}`}>
-      {prefix && <span className="df-input__prefix">{prefix}</span>}
+      {leadingIcon && <span className="df-input__prefix">{renderIconProp(leadingIcon)}</span>}
       <input
         ref={ref}
         id={inputId}
@@ -31,7 +43,7 @@ export const Input = React.forwardRef(({
         className="df-input__native"
         {...props}
       />
-      {suffix && <span className="df-input__suffix">{suffix}</span>}
+      {suffix && <span className="df-input__suffix">{renderIconProp(suffix)}</span>}
     </div>
   );
 

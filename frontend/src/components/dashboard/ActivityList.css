@@ -1,7 +1,6 @@
 .df-activity-list {
   display: flex;
   flex-direction: column;
-  divide-y: 1px solid var(--border-subtle);
 }
 
 .df-activity-item {

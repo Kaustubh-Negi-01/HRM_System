@@ -335,7 +335,7 @@ export const HRCopilot = () => {
                   width: '100%',
                   padding: '0.75rem 1.25rem',
                   backgroundColor: 'var(--bg-surface-elevated)',
-                  border: '1px solid var(--border-medium)',
+                  border: '1px solid var(--border)',
                   borderRadius: 'var(--radius-lg)',
                   color: 'var(--text-primary)',
                   fontSize: '0.875rem',

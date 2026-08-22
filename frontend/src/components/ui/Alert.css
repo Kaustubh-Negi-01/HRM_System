@@ -11,26 +11,46 @@
 
 .df-alert--info {
   background-color: var(--info-soft);
-  color: #1E40AF;
+  color: var(--text);
   border-left-color: var(--info);
+}
+
+.df-alert--info .df-alert__title,
+.df-alert--info .df-alert__icon {
+  color: var(--info);
 }
 
 .df-alert--success {
   background-color: var(--success-soft);
-  color: #166534;
+  color: var(--text);
   border-left-color: var(--success);
+}
+
+.df-alert--success .df-alert__title,
+.df-alert--success .df-alert__icon {
+  color: var(--success);
 }
 
 .df-alert--warning {
   background-color: var(--warning-soft);
-  color: #92400E;
+  color: var(--text);
   border-left-color: var(--warning);
+}
+
+.df-alert--warning .df-alert__title,
+.df-alert--warning .df-alert__icon {
+  color: var(--warning);
 }
 
 .df-alert--danger {
   background-color: var(--danger-soft);
-  color: #991B1B;
+  color: var(--text);
   border-left-color: var(--danger);
+}
+
+.df-alert--danger .df-alert__title,
+.df-alert--danger .df-alert__icon {
+  color: var(--danger);
 }
 
 .df-alert__icon {

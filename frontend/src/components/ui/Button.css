@@ -97,7 +97,18 @@
 
 .df-button--success:hover:not(:disabled) {
   background-color: #15803D;
-  border-color: #15803D;
+}
+
+.df-button--outline {
+  background-color: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.df-button--outline:hover:not(:disabled) {
+  background-color: var(--surface-secondary);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 /* Spinner */

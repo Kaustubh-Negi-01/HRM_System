@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Bell, User, Settings, LogOut } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Dropdown } from '../ui/Dropdown';
@@ -17,18 +18,34 @@ export const Topbar = ({
   showSearch = true,
   className = '',
 }) => {
+  const navigate = useNavigate();
+
   const userMenuItems = [
     {
       key: 'profile',
       label: 'My Profile',
       icon: <User size={15} />,
-      onClick: () => {},
+      onClick: () => {
+        const role = (user?.role || '').toLowerCase();
+        if (role === 'admin' || role === 'hr') {
+          navigate('/admin/employees');
+        } else {
+          navigate('/employee/profile');
+        }
+      },
     },
     {
       key: 'settings',
       label: 'Settings',
       icon: <Settings size={15} />,
-      onClick: () => {},
+      onClick: () => {
+        const role = (user?.role || '').toLowerCase();
+        if (role === 'admin' || role === 'hr') {
+          navigate('/admin/settings');
+        } else {
+          navigate('/employee/profile');
+        }
+      },
     },
     {
       divider: true,
@@ -62,7 +79,7 @@ export const Topbar = ({
               {breadcrumbs.map((crumb, idx) => (
                 <span key={crumb.label || idx} className="df-topbar__crumb">
                   {crumb.to ? (
-                    <a href={crumb.to} className="df-topbar__crumb-link">{crumb.label}</a>
+                    <Link to={crumb.to} className="df-topbar__crumb-link">{crumb.label}</Link>
                   ) : (
                     <span className="df-topbar__crumb-current">{crumb.label}</span>
                   )}
@@ -115,8 +132,8 @@ export const Topbar = ({
               className="df-topbar__profile-trigger"
               aria-label="User menu"
             >
-              <Avatar name={user.name} size="sm" />
-              <span className="df-topbar__profile-name">{user.name}</span>
+              <Avatar name={user?.name || 'User'} size="sm" />
+              <span className="df-topbar__profile-name">{user?.name || 'User'}</span>
             </button>
           }
         />

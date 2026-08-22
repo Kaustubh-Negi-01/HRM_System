@@ -9,6 +9,7 @@ export const Table = ({
   columns = [],
   data = [],
   loading = false,
+  isLoading = false,
   emptyTitle = 'No records found',
   emptyDescription = 'There are no items matching your criteria.',
   emptyAction,
@@ -21,13 +22,14 @@ export const Table = ({
   wrapperClassName = '',
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const isTableLoading = loading || isLoading;
 
   // Pagination logic
   const totalItems = data ? data.length : 0;
   const totalPages = pagination ? Math.ceil(totalItems / pageSize) || 1 : 1;
   const validPage = Math.min(Math.max(1, currentPage), totalPages);
 
-  const displayData = pagination && !loading
+  const displayData = pagination && !isTableLoading
     ? data.slice((validPage - 1) * pageSize, validPage * pageSize)
     : data;
 
@@ -55,7 +57,7 @@ export const Table = ({
             </tr>
           </thead>
           <tbody>
-            {loading ? (
+            {isTableLoading ? (
               Array.from({ length: pageSize > 6 ? 6 : pageSize }).map((_, rIdx) => (
                 <tr key={`loading-row-${rIdx}`} className="df-table__tr-loading">
                   {columns.map((col, cIdx) => (
@@ -116,7 +118,7 @@ export const Table = ({
         </table>
       </div>
 
-      {pagination && !loading && totalItems > 0 && (
+      {pagination && !isTableLoading && totalItems > 0 && (
         <div className="df-table-pagination">
           <span className="df-table-pagination__info">
             Showing <strong className="table-num">{startItem}</strong>–<strong className="table-num">{endItem}</strong> of <strong className="table-num">{totalItems}</strong> entries

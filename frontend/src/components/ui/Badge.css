@@ -44,7 +44,7 @@
 
 .df-badge--warning {
   background-color: var(--warning-soft);
-  color: #B45309;
+  color: var(--warning);
 }
 
 .df-badge--danger {
@@ -63,6 +63,7 @@
 }
 
 .df-badge--secondary {
-  background-color: #F3F4F6;
-  color: #374151;
+  background-color: var(--surface-secondary);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
