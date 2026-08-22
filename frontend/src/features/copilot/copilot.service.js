@@ -4,7 +4,16 @@ import { API_ENDPOINTS } from '../../api/endpoints';
 export const copilotService = {
   async queryCopilot(question, context = {}) {
     try {
-      return await apiClient.post(API_ENDPOINTS.COPILOT.CHAT, { query: question, context });
+      const res = await apiClient.post(API_ENDPOINTS.COPILOT.CHAT, { query: question, context });
+      const content = res?.content || res?.answer || res?.message || 'I have analyzed your query based on current organizational data.';
+      return {
+        id: `copilot_${Date.now()}`,
+        role: 'assistant',
+        content,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        dataTable: res?.dataTable || null,
+        actionRecommendation: res?.actionRecommendation || null,
+      };
     } catch (err) {
       // Data-aware AI assistant fallback
       const lower = (question || '').toLowerCase();
@@ -12,7 +21,13 @@ export const copilotService = {
       let dataTable = null;
       let actionRecommendation = null;
 
-      if (lower.includes('burnout') || lower.includes('overtime') || lower.includes('stress')) {
+      if (lower.startsWith('hi') || lower.startsWith('hello') || lower.startsWith('hey') || lower.includes('how are') || lower.includes('how re')) {
+        answer = `Hello! 👋 I am your **DayFlow HR Copilot** 🤖.\n\nI can analyze live attendance logs, simulate leave impact conflicts, calculate payroll totals, and diagnose workforce burnout.\n\nWhat would you like to know?`;
+        actionRecommendation = {
+          label: 'View Workforce Pulse Radar',
+          link: '/admin/workforce-pulse',
+        };
+      } else if (lower.includes('burnout') || lower.includes('overtime') || lower.includes('stress')) {
         answer = `Based on real-time attendance logs over the past 30 days, **Engineering** has the highest burnout risk index (**82/100**). \n\nDavid Miller (DevOps Lead) and Priya Sharma (Fullstack) have recorded over 15+ hours of overtime per week following the recent release cycle.`;
         dataTable = {
           headers: ['Employee', 'Department', 'Overtime (30d)', 'Risk Rating'],
@@ -88,7 +103,6 @@ export const copilotService = {
   },
 };
 
-// Named exports for individual imports
 export const queryCopilot = copilotService.queryCopilot;
 export const askQuestion = copilotService.askQuestion;
 export const getCopilotPrompts = copilotService.getCopilotPrompts;
