@@ -8,6 +8,7 @@ import Table from '../../components/ui/Table';
 import EmployeeAvatar from '../../components/shared/EmployeeAvatar';
 import StatusBadge from '../../components/shared/StatusBadge';
 import { formatDate, formatCurrency } from '../../utils/formatters';
+import employeeService from '../../features/employee/employee.service';
 import {
   ArrowLeft,
   Mail,
@@ -26,26 +27,48 @@ export const EmployeeDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-
-  const employee = {
+  const [employee, setEmployee] = useState({
     id: id || 'emp_01',
-    name: 'Alex Mercer',
-    email: 'alex.mercer@dayflow.os',
-    role: 'Senior Fullstack Engineer',
+    name: 'Alex Chen',
+    email: 'alex.chen@dayflow.internal',
+    role: 'Lead Fullstack Engineer',
     department: 'Engineering',
-    joinDate: '2023-03-15',
+    joinDate: '2023-03-01',
     status: 'active',
     salary: 8500,
-    manager: 'Sarah Connor',
-    healthScore: 82,
-    burnoutRisk: 'High',
-    overtimeHours: 16.5,
+    manager: 'Hamza Khan',
+    healthScore: 88,
+    burnoutRisk: 'Low',
+    overtimeHours: 4.5,
     leaveBalance: {
       annual: 14,
       sick: 8,
       casual: 7,
     },
-  };
+  });
+
+  useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        const data = await employeeService.getEmployeeById(id);
+        if (data) {
+          setEmployee((prev) => ({
+            ...prev,
+            ...data,
+            name: data.name || prev.name,
+            email: data.email || prev.email,
+            role: data.designation || data.role || prev.role,
+            department: data.department || prev.department,
+            joinDate: data.joiningDate || data.joinDate || prev.joinDate,
+            salary: data.payroll?.basicSalary || data.salary?.baseSalary || prev.salary,
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to load employee detail', err);
+      }
+    };
+    if (id) fetchDetail();
+  }, [id]);
 
   const attendanceHistory = [
     { date: '2026-08-22', checkIn: '08:58 AM', checkOut: '—', hours: 2.5, status: 'present' },

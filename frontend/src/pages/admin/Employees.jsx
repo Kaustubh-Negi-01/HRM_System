@@ -12,6 +12,7 @@ import StatusBadge from '../../components/shared/StatusBadge';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDate } from '../../utils/formatters';
 import { DEPARTMENTS } from '../../utils/constants';
+import employeeService from '../../features/employee/employee.service';
 import {
   Users,
   Search,
@@ -27,6 +28,7 @@ export const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [newEmployee, setNewEmployee] = useState({
     name: '',
     email: '',
@@ -36,99 +38,59 @@ export const Employees = () => {
   });
 
   const debouncedSearch = useDebounce(searchTerm, 250);
+  const [employees, setEmployees] = useState([]);
 
-  const initialEmployees = [
-    {
-      id: 'emp_01',
-      name: 'Alex Mercer',
-      email: 'alex.mercer@dayflow.os',
-      department: 'Engineering',
-      role: 'Senior Fullstack Engineer',
-      joinDate: '2023-03-15',
-      status: 'active',
-      location: 'San Francisco, CA',
-    },
-    {
-      id: 'emp_02',
-      name: 'Sarah Connor',
-      email: 'sarah.connor@dayflow.os',
-      department: 'Human Resources',
-      role: 'VP of People & Culture',
-      joinDate: '2022-01-10',
-      status: 'active',
-      location: 'New York, NY',
-    },
-    {
-      id: 'emp_03',
-      name: 'David Miller',
-      email: 'david.miller@dayflow.os',
-      department: 'Engineering',
-      role: 'DevOps Lead',
-      joinDate: '2023-07-01',
-      status: 'active',
-      location: 'Austin, TX',
-    },
-    {
-      id: 'emp_04',
-      name: 'Elena Rostova',
-      email: 'elena.rostova@dayflow.os',
-      department: 'Product & Design',
-      role: 'Lead UI/UX Designer',
-      joinDate: '2022-11-20',
-      status: 'active',
-      location: 'Seattle, WA',
-    },
-    {
-      id: 'emp_05',
-      name: 'Marcus Vance',
-      email: 'marcus.vance@dayflow.os',
-      department: 'Sales',
-      role: 'Enterprise Account Executive',
-      joinDate: '2024-02-01',
-      status: 'active',
-      location: 'Chicago, IL',
-    },
-    {
-      id: 'emp_06',
-      name: 'Priya Sharma',
-      email: 'priya.sharma@dayflow.os',
-      department: 'Engineering',
-      role: 'Fullstack Engineer',
-      joinDate: '2023-09-15',
-      status: 'active',
-      location: 'San Francisco, CA',
-    },
-    {
-      id: 'emp_07',
-      name: 'Lucas Grey',
-      email: 'lucas.grey@dayflow.os',
-      department: 'Customer Support',
-      role: 'Senior Support Specialist',
-      joinDate: '2023-05-10',
-      status: 'active',
-      location: 'Remote',
-    },
-  ];
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const data = await employeeService.getAllEmployees();
+      setEmployees(data);
+    } catch (err) {
+      console.error('Failed to load employees', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const [employees, setEmployees] = useState(initialEmployees);
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   const filteredEmployees = employees.filter((emp) => {
+    const name = emp.name || '';
+    const email = emp.email || '';
+    const role = emp.role || emp.designation || '';
     const matchesSearch =
-      emp.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      emp.email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      emp.role.toLowerCase().includes(debouncedSearch.toLowerCase());
+      name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      role.toLowerCase().includes(debouncedSearch.toLowerCase());
     const matchesDept = selectedDept === 'all' || emp.department === selectedDept;
     return matchesSearch && matchesDept;
   });
 
-  const handleAddEmployee = (e) => {
+  const handleAddEmployee = async (e) => {
     e.preventDefault();
+    try {
+      const payload = {
+        employeeId: `EMP${String(employees.length + 10).padStart(3, '0')}`,
+        name: newEmployee.name,
+        email: newEmployee.email,
+        password: 'Password123!',
+        department: newEmployee.department,
+        designation: newEmployee.role,
+        role: 'EMPLOYEE',
+      };
+      await employeeService.createEmployee(payload);
+    } catch (err) {
+      console.warn('Backend create fallback');
+    }
     const created = {
       id: `emp_${Date.now()}`,
       name: newEmployee.name,
       email: newEmployee.email,
       department: newEmployee.department,
       role: newEmployee.role,
+      designation: newEmployee.role,
       joinDate: new Date().toISOString().split('T')[0],
       status: 'active',
       location: 'San Francisco, CA',

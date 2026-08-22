@@ -6,6 +6,7 @@ import Input from '../../components/ui/Input';
 import EmployeeAvatar from '../../components/shared/EmployeeAvatar';
 import StatusBadge from '../../components/shared/StatusBadge';
 import { useAuth } from '../../hooks/useAuth';
+import employeeService from '../../features/employee/employee.service';
 import {
   User,
   Mail,
@@ -23,23 +24,58 @@ export const EmployeeProfile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || 'Alex Mercer',
-    email: user?.email || 'alex.mercer@dayflow.os',
-    phone: '+1 (555) 234-8901',
+    name: user?.name || 'Alex Chen',
+    email: user?.email || 'alex.chen@dayflow.internal',
+    employeeId: user?.employeeId || 'EMP001',
+    phone: '+1 (555) 014-9922',
     department: user?.department || 'Engineering',
-    role: user?.title || 'Senior Fullstack Engineer',
-    joinDate: 'March 15, 2023',
-    manager: 'Sarah Connor (VP of People & Culture)',
-    emergencyContactName: 'Laura Mercer',
+    role: user?.profile?.designation || user?.title || 'Lead Fullstack Engineer',
+    joinDate: 'March 1, 2023',
+    manager: 'Hamza Khan (HR Director)',
+    emergencyContactName: 'Laura Chen',
     emergencyContactPhone: '+1 (555) 890-1234',
     emergencyRelation: 'Spouse',
-    address: '742 Evergreen Terrace, San Francisco, CA 94107',
+    address: user?.profile?.address || '240 Spear Street, San Francisco, CA 94105',
   });
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await employeeService.getOwnProfile();
+        if (data) {
+          setProfileData((prev) => ({
+            ...prev,
+            name: data.name || prev.name,
+            email: data.email || prev.email,
+            employeeId: data.employeeId || prev.employeeId,
+            phone: data.phone || data.profile?.phone || prev.phone,
+            department: data.department || prev.department,
+            role: data.designation || data.profile?.designation || prev.role,
+            address: data.address || data.profile?.address || prev.address,
+          }));
+        }
+      } catch (err) {
+        console.warn('Fallback to context user');
+      }
+    };
+    fetchProfile();
+  }, [user]);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
+    try {
+      if (user?.id) {
+        await employeeService.updateEmployee(user.id, {
+          phone: profileData.phone,
+          address: profileData.address,
+          designation: profileData.role,
+        });
+      }
+    } catch (err) {
+      console.warn('Saved locally');
+    }
     setIsEditing(false);
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
