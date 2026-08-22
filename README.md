@@ -81,23 +81,38 @@ HRM_System/
 
 ---
 
-## 🛠️ Getting Started
+## 🛠️ Quick Start Guide (Run on Any Laptop)
 
-### 1. Prerequisites
-- Node.js (v18+ recommended)
-- MongoDB (running locally or MongoDB Atlas URI)
-
-### 2. Setup & Installation
+### 1. Clone & Install
 ```bash
 # Clone the repository
 git clone https://github.com/Kaustubh-Negi-01/HRM_System.git
 cd HRM_System
 
-# Install dependencies for both frontend and backend
+# Install all dependencies (Frontend + Backend in 1 command)
 npm run setup
+```
 
-# Configure environment variables
-cp .env.example backend/.env
+### 2. Launch Platform
+```bash
+# Start both Backend (Port 5001) & Frontend (Port 3000) concurrently
+npm start
+```
+
+### 3. Open in Browser
+Open **[http://localhost:3000](http://localhost:3000)** in any browser.
+
+---
+
+### 🔑 Demo Accounts (Pre-Seeded & Ready):
+
+| Role | Email | Password | Persona Card |
+|---|---|---|---|
+| **HR / Admin** | `admin@dayflow.internal` | `Password123!` | Saksham Singh (HR Director) |
+| **Lead Engineer** | `alex.chen@dayflow.internal` | `Password123!` | Alex Chen (Engineering) |
+| **Support Specialist** | `priya.sharma@dayflow.internal` | `Password123!` | Priya Sharma (Support) |
+
+*(You can also click the 1-Click Persona cards directly on the login page for instant sign-in!)*
 ```
 
 ### 3. Running Locally
