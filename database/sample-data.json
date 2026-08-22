@@ -1,0 +1,38 @@
+{
+  "users": [
+    { "employeeId": "ADM001", "name": "Hamza Khan", "email": "admin@dayflow.internal", "role": "ADMIN", "department": "Human Resources" },
+    { "employeeId": "EMP001", "name": "Alex Chen", "email": "alex.chen@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },
+    { "employeeId": "EMP002", "name": "Elena Rostova", "email": "elena.rostova@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },
+    { "employeeId": "EMP003", "name": "Marcus Vance", "email": "marcus.vance@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },
+    { "employeeId": "EMP004", "name": "Priya Sharma", "email": "priya.sharma@dayflow.internal", "role": "EMPLOYEE", "department": "Support" },
+    { "employeeId": "EMP005", "name": "David Kim", "email": "david.kim@dayflow.internal", "role": "EMPLOYEE", "department": "Support" },
+    { "employeeId": "EMP006", "name": "Amina Diallo", "email": "amina.diallo@dayflow.internal", "role": "EMPLOYEE", "department": "Support" },
+    { "employeeId": "EMP007", "name": "Sarah Jenkins", "email": "sarah.jenkins@dayflow.internal", "role": "EMPLOYEE", "department": "Human Resources" },
+    { "employeeId": "EMP008", "name": "Ryan Patel", "email": "ryan.patel@dayflow.internal", "role": "EMPLOYEE", "department": "Product" },
+    { "employeeId": "EMP009", "name": "Zoe Martinez", "email": "zoe.martinez@dayflow.internal", "role": "EMPLOYEE", "department": "Product" }
+  ],
+  "profiles": [
+    { "employeeId": "ADM001", "designation": "HR Director", "phone": "+1 (555) 019-2831", "address": "100 Innovation Way, Suite 400" },
+    { "employeeId": "EMP001", "designation": "Staff Full Stack Engineer", "phone": "+1 (555) 012-3456", "address": "42 Silicon Avenue, Apt 3B" },
+    { "employeeId": "EMP002", "designation": "Frontend Lead", "phone": "+1 (555) 013-4567", "address": "77 Telegraph Hill, San Francisco" },
+    { "employeeId": "EMP003", "designation": "Cloud Platform Engineer", "phone": "+1 (555) 014-5678", "address": "808 Tech Park Drive" },
+    { "employeeId": "EMP004", "designation": "Senior Support Specialist", "phone": "+1 (555) 015-6789", "address": "12 Mission District Blvd" },
+    { "employeeId": "EMP005", "designation": "Customer Support Lead", "phone": "+1 (555) 016-7890", "address": "304 Market Street" },
+    { "employeeId": "EMP006", "designation": "Customer Support Agent", "phone": "+1 (555) 017-8901", "address": "55 Ocean View Ave" },
+    { "employeeId": "EMP007", "designation": "People Operations Manager", "phone": "+1 (555) 018-1234", "address": "900 Pine Valley Rd" },
+    { "employeeId": "EMP008", "designation": "Principal Product Manager", "phone": "+1 (555) 019-5678", "address": "210 Columbus Ave" },
+    { "employeeId": "EMP009", "designation": "Lead UI/UX Designer", "phone": "+1 (555) 020-9012", "address": "150 Greenwich St" }
+  ],
+  "payroll": [
+    { "employeeId": "ADM001", "basicSalary": 110000, "allowances": 15000, "deductions": 5000, "netSalary": 120000 },
+    { "employeeId": "EMP001", "basicSalary": 95000, "allowances": 8000, "deductions": 4000, "netSalary": 99000 },
+    { "employeeId": "EMP002", "basicSalary": 90000, "allowances": 7500, "deductions": 3500, "netSalary": 94000 },
+    { "employeeId": "EMP003", "basicSalary": 82000, "allowances": 6000, "deductions": 3000, "netSalary": 85000 },
+    { "employeeId": "EMP004", "basicSalary": 62000, "allowances": 4000, "deductions": 2000, "netSalary": 64000 },
+    { "employeeId": "EMP005", "basicSalary": 70000, "allowances": 5000, "deductions": 2500, "netSalary": 72500 },
+    { "employeeId": "EMP006", "basicSalary": 52000, "allowances": 3000, "deductions": 1500, "netSalary": 53500 },
+    { "employeeId": "EMP007", "basicSalary": 78000, "allowances": 5000, "deductions": 2800, "netSalary": 80200 },
+    { "employeeId": "EMP008", "basicSalary": 98000, "allowances": 8500, "deductions": 4200, "netSalary": 102300 },
+    { "employeeId": "EMP009", "basicSalary": 84000, "allowances": 6500, "deductions": 3200, "netSalary": 87300 }
+  ]
+}
