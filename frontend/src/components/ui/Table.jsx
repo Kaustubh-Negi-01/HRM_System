@@ -93,7 +93,7 @@ export const Table = ({
                           style={{ textAlign: col.align || 'left' }}
                           className={`df-table__td ${isNumeric ? 'table-num' : ''}`}
                         >
-                          {col.render ? col.render(row, actualIndex) : (value ?? '—')}
+                          {col.render ? col.render(row[col.key], row, actualIndex) : (value ?? '—')}
                         </td>
                       );
                     })}

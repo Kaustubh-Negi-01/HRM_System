@@ -7,8 +7,8 @@ import Card from '../../components/ui/Card';
 import { Sparkles, Mail, Lock, ShieldCheck, UserCheck, ArrowRight } from 'lucide-react';
 
 export const Login = () => {
-  const [email, setEmail] = useState('admin@dayflow.os');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('admin@dayflow.internal');
+  const [password, setPassword] = useState('Password123!');
   const [selectedRole, setSelectedRole] = useState('admin');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -16,10 +16,10 @@ export const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handlePersonaSelect = (role, demoEmail) => {
+  const handlePersonaSelect = (role, demoEmail, demoPass) => {
     setSelectedRole(role);
     setEmail(demoEmail);
-    setPassword('password123');
+    setPassword(demoPass || 'Password123!');
   };
 
   const handleSubmit = async (e) => {
@@ -29,10 +29,11 @@ export const Login = () => {
 
     try {
       const res = await login({ email, password, role: selectedRole });
-      if (res?.user?.role === 'admin' || selectedRole === 'admin') {
-        navigate('/admin/dashboard');
+      const role = res?.user?.role || res?.role || selectedRole;
+      if (role === 'admin' || role === 'hr') {
+        navigate('/admin');
       } else {
-        navigate('/employee/dashboard');
+        navigate('/employee');
       }
     } catch (err) {
       setError(err.message || 'Failed to sign in. Please verify your credentials.');
@@ -48,7 +49,7 @@ export const Login = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'var(--bg-canvas)',
+        backgroundColor: 'var(--bg-canvas, #090D16)',
         padding: '1.5rem',
         backgroundImage: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent)',
       }}
@@ -60,13 +61,13 @@ export const Login = () => {
             style={{
               width: '48px',
               height: '48px',
-              borderRadius: 'var(--radius-lg)',
+              borderRadius: 'var(--radius-lg, 16px)',
               background: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#FFFFFF',
-              boxShadow: 'var(--shadow-glow)',
+              boxShadow: '0 0 25px rgba(99, 102, 241, 0.3)',
               marginBottom: '1rem',
             }}
           >
@@ -81,7 +82,7 @@ export const Login = () => {
         </div>
 
         {/* Login Card */}
-        <Card variant="elevated" style={{ padding: '2rem' }}>
+        <Card hoverable style={{ padding: '2rem' }}>
           {/* Persona Demo Switcher */}
           <div style={{ marginBottom: '1.5rem' }}>
             <label className="text-xs font-semibold text-muted" style={{ letterSpacing: '0.04em', textTransform: 'uppercase' }}>
@@ -90,46 +91,46 @@ export const Login = () => {
             <div className="grid grid-cols-2 gap-2" style={{ marginTop: '0.5rem' }}>
               <button
                 type="button"
-                onClick={() => handlePersonaSelect('admin', 'admin@dayflow.os')}
+                onClick={() => handlePersonaSelect('admin', 'admin@dayflow.internal', 'Password123!')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
                   padding: '0.625rem 0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: `1px solid ${selectedRole === 'admin' ? 'var(--primary)' : 'var(--border-subtle)'}`,
-                  backgroundColor: selectedRole === 'admin' ? 'var(--primary-bg)' : 'rgba(15, 23, 42, 0.5)',
-                  color: selectedRole === 'admin' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  borderRadius: 'var(--radius-md, 10px)',
+                  border: `1px solid ${selectedRole === 'admin' ? 'var(--primary, #6366F1)' : 'var(--border-subtle, rgba(255,255,255,0.1))'}`,
+                  backgroundColor: selectedRole === 'admin' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(15, 23, 42, 0.5)',
+                  color: selectedRole === 'admin' ? 'var(--text-primary, #F8FAFC)' : 'var(--text-secondary, #94A3B8)',
                   cursor: 'pointer',
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  transition: 'all var(--transition-fast)',
+                  transition: 'all 150ms ease',
                 }}
               >
-                <ShieldCheck size={16} style={{ color: 'var(--primary)' }} />
+                <ShieldCheck size={16} style={{ color: 'var(--primary, #6366F1)' }} />
                 <span>HR / Admin</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => handlePersonaSelect('employee', 'alex.mercer@dayflow.os')}
+                onClick={() => handlePersonaSelect('employee', 'alex.chen@dayflow.internal', 'Password123!')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
                   padding: '0.625rem 0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  border: `1px solid ${selectedRole === 'employee' ? 'var(--pulse-cyan)' : 'var(--border-subtle)'}`,
-                  backgroundColor: selectedRole === 'employee' ? 'var(--pulse-cyan-bg)' : 'rgba(15, 23, 42, 0.5)',
-                  color: selectedRole === 'employee' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  borderRadius: 'var(--radius-md, 10px)',
+                  border: `1px solid ${selectedRole === 'employee' ? 'var(--pulse-cyan, #06B6D4)' : 'var(--border-subtle, rgba(255,255,255,0.1))'}`,
+                  backgroundColor: selectedRole === 'employee' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(15, 23, 42, 0.5)',
+                  color: selectedRole === 'employee' ? 'var(--text-primary, #F8FAFC)' : 'var(--text-secondary, #94A3B8)',
                   cursor: 'pointer',
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  transition: 'all var(--transition-fast)',
+                  transition: 'all 150ms ease',
                 }}
               >
-                <UserCheck size={16} style={{ color: 'var(--pulse-cyan)' }} />
-                <span>Employee</span>
+                <UserCheck size={16} style={{ color: 'var(--pulse-cyan, #06B6D4)' }} />
+                <span>Alex (Employee)</span>
               </button>
             </div>
           </div>
@@ -140,10 +141,10 @@ export const Login = () => {
                 className="text-xs font-medium"
                 style={{
                   padding: '0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--danger-bg)',
+                  borderRadius: 'var(--radius-md, 10px)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.12)',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
-                  color: 'var(--danger)',
+                  color: 'var(--danger, #EF4444)',
                 }}
               >
                 {error}
@@ -153,17 +154,17 @@ export const Login = () => {
             <Input
               label="Email Address"
               type="email"
-              icon={Mail}
+              prefix={<Mail size={16} />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="name@dayflow.internal"
               required
             />
 
             <Input
               label="Password"
               type="password"
-              icon={Lock}
+              prefix={<Lock size={16} />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -174,10 +175,10 @@ export const Login = () => {
               type="submit"
               variant="primary"
               size="lg"
-              isLoading={loading}
-              icon={ArrowRight}
-              iconPosition="right"
-              style={{ marginTop: '0.5rem', width: '100%' }}
+              loading={loading}
+              iconRight={<ArrowRight size={16} />}
+              fullWidth
+              style={{ marginTop: '0.5rem' }}
             >
               Sign In to DayFlow
             </Button>
@@ -185,10 +186,10 @@ export const Login = () => {
 
           <div
             className="flex items-center justify-between text-xs text-muted"
-            style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}
+            style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}
           >
             <span>Don't have an account?</span>
-            <Link to="/signup" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
+            <Link to="/signup" style={{ color: 'var(--primary, #6366F1)', textDecoration: 'none', fontWeight: 600 }}>
               Create Organization
             </Link>
           </div>

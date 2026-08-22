@@ -1,9 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthProvider, { AuthContext } from './features/auth/auth.context';
 import ProtectedRoute from './components/layout/ProtectedRoute';
-import Sidebar from './components/layout/Sidebar';
-import Topbar from './components/layout/Topbar';
+import { AdminLayout, EmployeeLayout } from './layout';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -27,19 +26,6 @@ import WorkforcePulse from './pages/admin/WorkforcePulse';
 import LeaveImpact from './pages/admin/LeaveImpact';
 import HRCopilot from './pages/admin/HRCopilot';
 
-// Master App Shell with Sidebar & Topbar
-const AppLayout = () => {
-  return (
-    <div className="app-container">
-      <Sidebar />
-      <div className="main-content">
-        <Topbar />
-        <Outlet />
-      </div>
-    </div>
-  );
-};
-
 // Root index redirection helper
 const RootRedirect = () => {
   const { user, isAuthenticated, loading } = React.useContext(AuthContext);
@@ -47,9 +33,9 @@ const RootRedirect = () => {
   if (loading) return null;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role === 'admin' || user?.role === 'hr') {
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to="/admin" replace />;
   }
-  return <Navigate to="/employee/dashboard" replace />;
+  return <Navigate to="/employee" replace />;
 };
 
 export function App() {
@@ -63,7 +49,8 @@ export function App() {
 
           {/* Protected Employee Workspace */}
           <Route element={<ProtectedRoute allowedRoles={['employee', 'admin', 'hr', 'manager']} />}>
-            <Route element={<AppLayout />}>
+            <Route element={<EmployeeLayout />}>
+              <Route path="/employee" element={<EmployeeDashboard />} />
               <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
               <Route path="/employee/attendance" element={<EmployeeAttendance />} />
               <Route path="/employee/leave" element={<EmployeeLeave />} />
@@ -74,7 +61,8 @@ export function App() {
 
           {/* Protected Admin & Workforce Intelligence Suite */}
           <Route element={<ProtectedRoute allowedRoles={['admin', 'hr', 'manager']} />}>
-            <Route element={<AppLayout />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/employees" element={<Employees />} />
               <Route path="/admin/employees/:id" element={<EmployeeDetails />} />
@@ -85,6 +73,7 @@ export function App() {
               <Route path="/admin/workforce-pulse" element={<WorkforcePulse />} />
               <Route path="/admin/leave-impact" element={<LeaveImpact />} />
               <Route path="/admin/copilot" element={<HRCopilot />} />
+              <Route path="/admin/hr-copilot" element={<HRCopilot />} />
             </Route>
           </Route>
 

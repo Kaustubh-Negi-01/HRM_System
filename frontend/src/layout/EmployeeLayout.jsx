@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
+import { useAuth } from '../hooks/useAuth';
 import './EmployeeLayout.css';
 
 const EMPLOYEE_NAV_SECTIONS = [
@@ -25,15 +26,16 @@ const EMPLOYEE_NAV_SECTIONS = [
 ];
 
 export const EmployeeLayout = ({
-  user = { name: 'Sarah Jenkins', role: 'Senior Product Designer', email: 'sarah.j@dayflow.io' },
+  user: propUser,
 }) => {
+  const { user: authUser, logout } = useAuth();
+  const activeUser = propUser || authUser || { name: 'Employee', role: 'Staff Member', email: 'alex.chen@dayflow.internal' };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleLogout = () => {
-    localStorage.removeItem('dayflow_user');
-    localStorage.removeItem('token');
+    logout();
     navigate('/login');
   };
 
@@ -50,7 +52,7 @@ export const EmployeeLayout = ({
     <div className="df-employee-shell">
       <Sidebar
         sections={EMPLOYEE_NAV_SECTIONS}
-        user={user}
+        user={activeUser}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onLogout={handleLogout}
@@ -58,7 +60,7 @@ export const EmployeeLayout = ({
 
       <div className="df-employee-main">
         <Topbar
-          user={user}
+          user={activeUser}
           breadcrumbs={breadcrumbs}
           onMenuClick={() => setIsSidebarOpen(true)}
           onLogout={handleLogout}

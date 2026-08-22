@@ -5,6 +5,7 @@ import './Modal.css';
 
 export const Modal = ({
   open = false,
+  isOpen = false,
   onClose,
   title,
   subtitle,
@@ -17,15 +18,16 @@ export const Modal = ({
   className = '',
 }) => {
   const modalRef = useRef(null);
+  const isVisible = Boolean(open || isOpen);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (closeOnEsc && e.key === 'Escape' && open && onClose) {
+      if (closeOnEsc && e.key === 'Escape' && isVisible && onClose) {
         onClose();
       }
     };
 
-    if (open) {
+    if (isVisible) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     } else {
@@ -36,9 +38,9 @@ export const Modal = ({
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [open, closeOnEsc, onClose]);
+  }, [isVisible, closeOnEsc, onClose]);
 
-  if (!open) return null;
+  if (!isVisible) return null;
 
   const handleOverlayClick = (e) => {
     if (closeOnOverlayClick && e.target === e.currentTarget && onClose) {
