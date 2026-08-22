@@ -5,10 +5,12 @@ export const PageHeader = ({
   title,
   subtitle,
   actions,
+  action,
   badge,
   className = '',
 }) => {
-  if (!title && !subtitle && !actions && !badge) return null;
+  const headerActions = actions || action;
+  if (!title && !subtitle && !headerActions && !badge) return null;
 
   return (
     <div className={`df-page-header ${className}`}>
@@ -19,7 +21,7 @@ export const PageHeader = ({
         </div>
         {subtitle && <p className="df-page-header__subtitle">{subtitle}</p>}
       </div>
-      {actions && <div className="df-page-header__actions">{actions}</div>}
+      {headerActions && <div className="df-page-header__actions">{headerActions}</div>}
     </div>
   );
 };
@@ -28,11 +30,13 @@ export const PageContainer = ({
   title,
   subtitle,
   actions,
+  action,
   badge,
   children,
   maxWidth,
   className = '',
 }) => {
+  const headerActions = actions || action;
   return (
     <main
       className={`df-page-container ${className}`}
@@ -41,7 +45,7 @@ export const PageContainer = ({
       <PageHeader
         title={title}
         subtitle={subtitle}
-        actions={actions}
+        actions={headerActions}
         badge={badge}
       />
       <div className="df-page-content">
