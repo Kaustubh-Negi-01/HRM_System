@@ -1,0 +1,78 @@
+.df-activity-list {
+  display: flex;
+  flex-direction: column;
+  divide-y: 1px solid var(--border-subtle);
+}
+
+.df-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.df-activity-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.df-activity-item:first-child {
+  padding-top: 0;
+}
+
+.df-activity-item__avatar {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.df-activity-item__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-secondary);
+  color: var(--text-muted);
+}
+
+.df-activity-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.df-activity-item__text {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.df-activity-item__name {
+  font-weight: 600;
+}
+
+.df-activity-item__action {
+  color: var(--text-secondary);
+}
+
+.df-activity-item__target {
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.df-activity-item__desc {
+  color: var(--text-muted);
+}
+
+.df-activity-item__timestamp {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.df-activity-item__badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+}

@@ -1,0 +1,41 @@
+.df-employee-avatar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: left;
+}
+
+.df-employee-avatar-wrapper--clickable {
+  cursor: pointer;
+}
+
+.df-employee-avatar-wrapper--clickable:hover .df-employee-avatar__name {
+  color: var(--primary);
+}
+
+.df-employee-avatar__details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+
+.df-employee-avatar__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-fast);
+}
+
+.df-employee-avatar__subtitle {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

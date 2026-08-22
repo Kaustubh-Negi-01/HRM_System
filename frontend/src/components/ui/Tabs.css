@@ -1,0 +1,93 @@
+.df-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.df-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line Variant */
+.df-tabs--line {
+  border-bottom: 1px solid var(--border);
+  gap: var(--space-6);
+}
+
+.df-tabs--line .df-tab-item {
+  position: relative;
+  padding: var(--space-3) var(--space-1);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.df-tabs--line .df-tab-item:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.df-tabs--line .df-tab-item--active {
+  color: var(--primary);
+  font-weight: 600;
+  border-bottom-color: var(--primary);
+}
+
+/* Pills Variant */
+.df-tabs--pills {
+  background-color: var(--surface-secondary);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+}
+
+.df-tabs--pills .df-tab-item {
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all var(--transition-fast);
+}
+
+.df-tabs--pills .df-tab-item:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.df-tabs--pills .df-tab-item--active {
+  background-color: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Disabled */
+.df-tab-item:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.df-tab-item__badge,
+.df-tab-item__count {
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background-color: var(--surface-secondary);
+  color: var(--text-muted);
+}
+
+.df-tab-item--active .df-tab-item__badge,
+.df-tab-item--active .df-tab-item__count {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+}

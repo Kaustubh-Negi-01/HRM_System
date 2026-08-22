@@ -1,0 +1,106 @@
+.df-dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+.df-dropdown__trigger {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.df-dropdown__menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  z-index: 500;
+  min-width: 180px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-1);
+  display: flex;
+  flex-direction: column;
+  animation: df-dropdown-pop 120ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.df-dropdown__menu--align-start {
+  left: 0;
+}
+
+.df-dropdown__menu--align-end {
+  right: 0;
+}
+
+.df-dropdown__menu--align-center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.df-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.df-dropdown__item:hover:not(:disabled) {
+  background-color: var(--surface-secondary);
+  color: var(--text);
+}
+
+.df-dropdown__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.df-dropdown__item--danger {
+  color: var(--danger);
+}
+
+.df-dropdown__item--danger:hover:not(:disabled) {
+  background-color: var(--danger-soft);
+  color: var(--danger);
+}
+
+.df-dropdown__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.df-dropdown__item--danger .df-dropdown__item-icon {
+  color: var(--danger);
+}
+
+.df-dropdown__item-label {
+  flex: 1;
+}
+
+.df-dropdown__item-badge {
+  font-size: 11px;
+}
+
+.df-dropdown__divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: var(--space-1) 0;
+}
+
+@keyframes df-dropdown-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

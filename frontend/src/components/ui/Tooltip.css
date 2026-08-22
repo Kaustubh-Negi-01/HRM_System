@@ -1,0 +1,52 @@
+.df-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.df-tooltip {
+  position: absolute;
+  z-index: 900;
+  padding: var(--space-1) var(--space-2);
+  background-color: #1E293B;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--shadow-md);
+  animation: df-tooltip-fade 120ms ease-out forwards;
+}
+
+.df-tooltip--top {
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.df-tooltip--bottom {
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.df-tooltip--left {
+  right: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.df-tooltip--right {
+  left: calc(100% + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@keyframes df-tooltip-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
