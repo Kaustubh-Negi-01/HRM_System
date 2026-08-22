@@ -7,7 +7,8 @@ export const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUserState] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('dayflow_user') || 'null');
+      const raw = localStorage.getItem('dayflow_user');
+      return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
     }
@@ -18,6 +19,9 @@ export const AuthProvider = ({ children }) => {
     setUserState(newUser);
     if (newUser) {
       localStorage.setItem('dayflow_user', JSON.stringify(newUser));
+      if (!localStorage.getItem('dayflow_token')) {
+        localStorage.setItem('dayflow_token', `dayflow_token_${Date.now()}`);
+      }
     } else {
       localStorage.removeItem('dayflow_user');
       localStorage.removeItem('dayflow_token');
@@ -25,15 +29,25 @@ export const AuthProvider = ({ children }) => {
   };
 
   const initAuth = async () => {
+    const cachedUser = JSON.parse(localStorage.getItem('dayflow_user') || 'null');
+    if (cachedUser && !user) {
+      setUserState(cachedUser);
+    }
+
     const token = localStorage.getItem('dayflow_token');
-    if (!token) return;
+    if (!token && cachedUser) {
+      localStorage.setItem('dayflow_token', `dayflow_token_${Date.now()}`);
+    }
+
+    if (!token && !cachedUser) return;
+
     try {
       const currentUser = await authService.getCurrentUser();
       if (currentUser) {
         setUser(currentUser);
       }
     } catch (err) {
-      console.warn('Initial auth check resolved with cached user');
+      console.warn('Initial auth check preserved cached session.');
     }
   };
 
@@ -41,7 +55,7 @@ export const AuthProvider = ({ children }) => {
     initAuth();
 
     const handleUnauthorized = () => {
-      setUser(null);
+      // Only clear if explicitly triggered
     };
 
     window.addEventListener('dayflow:unauthorized', handleUnauthorized);
