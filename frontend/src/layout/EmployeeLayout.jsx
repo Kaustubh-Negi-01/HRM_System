@@ -29,7 +29,13 @@ export const EmployeeLayout = ({
   user: propUser,
 }) => {
   const { user: authUser, logout } = useAuth();
-  const activeUser = propUser || authUser || { name: 'Employee', role: 'Staff Member', email: 'alex.chen@dayflow.internal' };
+  const activeUser = authUser || propUser || {
+    name: 'Alex Chen',
+    role: 'Lead Fullstack Engineer',
+    email: 'alex.chen@dayflow.internal',
+    department: 'Engineering',
+    title: 'Lead Fullstack Engineer',
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

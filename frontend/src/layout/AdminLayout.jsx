@@ -47,7 +47,13 @@ export const AdminLayout = ({
   customSections,
 }) => {
   const { user: authUser, logout } = useAuth();
-  const activeUser = propUser || authUser || { name: 'Admin', role: 'HR Administrator', email: 'admin@dayflow.internal' };
+  const activeUser = authUser || propUser || {
+    name: 'Saksham Singh',
+    role: 'HR Administrator',
+    email: 'admin@dayflow.internal',
+    department: 'Human Resources',
+    title: 'HR Director',
+  };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
