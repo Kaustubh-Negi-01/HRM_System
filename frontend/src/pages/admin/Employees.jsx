@@ -44,9 +44,17 @@ export const Employees = () => {
     setLoading(true);
     try {
       const data = await employeeService.getAllEmployees();
-      setEmployees(data);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.employees)
+        ? data.employees
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+      setEmployees(list);
     } catch (err) {
       console.error('Failed to load employees', err);
+      setEmployees([]);
     } finally {
       setLoading(false);
     }
@@ -56,14 +64,21 @@ export const Employees = () => {
     fetchEmployees();
   }, []);
 
-  const filteredEmployees = employees.filter((emp) => {
+  const safeEmployeeList = Array.isArray(employees)
+    ? employees
+    : Array.isArray(employees?.employees)
+    ? employees.employees
+    : [];
+
+  const filteredEmployees = safeEmployeeList.filter((emp) => {
+    if (!emp) return false;
     const name = emp.name || '';
     const email = emp.email || '';
     const role = emp.role || emp.designation || '';
     const matchesSearch =
-      name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      email.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      role.toLowerCase().includes(debouncedSearch.toLowerCase());
+      name.toLowerCase().includes((debouncedSearch || '').toLowerCase()) ||
+      email.toLowerCase().includes((debouncedSearch || '').toLowerCase()) ||
+      role.toLowerCase().includes((debouncedSearch || '').toLowerCase());
     const matchesDept = selectedDept === 'all' || emp.department === selectedDept;
     return matchesSearch && matchesDept;
   });
@@ -72,7 +87,7 @@ export const Employees = () => {
     e.preventDefault();
     try {
       const payload = {
-        employeeId: `EMP${String(employees.length + 10).padStart(3, '0')}`,
+        employeeId: `EMP${String(safeEmployeeList.length + 10).padStart(3, '0')}`,
         name: newEmployee.name,
         email: newEmployee.email,
         password: 'Password123!',
@@ -95,7 +110,7 @@ export const Employees = () => {
       status: 'active',
       location: 'San Francisco, CA',
     };
-    setEmployees([created, ...employees]);
+    setEmployees([created, ...safeEmployeeList]);
     setModalOpen(false);
     setNewEmployee({ name: '', email: '', department: 'Engineering', role: '', salary: '8500' });
   };
@@ -106,10 +121,10 @@ export const Employees = () => {
       key: 'name',
       render: (_, row) => (
         <div className="flex items-center gap-3">
-          <EmployeeAvatar name={row.name} size="md" />
+          <EmployeeAvatar name={row?.name || 'Employee'} size="md" />
           <div>
-            <p className="text-sm font-bold text-primary">{row.name}</p>
-            <p className="text-xs text-muted">{row.email}</p>
+            <p className="text-sm font-bold text-primary">{row?.name || 'Employee'}</p>
+            <p className="text-xs text-muted">{row?.email || ''}</p>
           </div>
         </div>
       ),
@@ -117,125 +132,175 @@ export const Employees = () => {
     {
       header: 'Department',
       key: 'department',
-      render: (val) => <span className="text-xs font-semibold text-secondary">{val}</span>,
+      render: (val) => (
+        <span className="text-xs font-semibold text-secondary">
+          {val || 'General'}
+        </span>
+      ),
     },
     {
       header: 'Designation / Role',
-      key: 'role',
-      render: (val) => <span className="text-xs text-primary">{val}</span>,
-    },
-    {
-      header: 'Join Date',
-      key: 'joinDate',
-      render: (val) => <span className="text-xs text-muted font-mono">{formatDate(val)}</span>,
+      key: 'designation',
+      render: (_, row) => (
+        <span className="text-xs text-primary font-medium">
+          {row?.designation || row?.role || 'Staff Member'}
+        </span>
+      ),
     },
     {
       header: 'Status',
       key: 'status',
-      render: (val) => <StatusBadge status={val} size="sm" />,
+      render: (val) => <StatusBadge status={val || 'active'} />,
     },
     {
-      header: 'Action',
+      header: 'Joining Date',
+      key: 'joinDate',
+      render: (val) => (
+        <span className="text-xs text-muted">
+          {val ? formatDate(val) : 'Jan 15, 2023'}
+        </span>
+      ),
+    },
+    {
+      header: 'Actions',
       key: 'actions',
       render: (_, row) => (
-        <Button
-          variant="outline"
-          size="sm"
-          icon={Eye}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/admin/employees/${row.id}`);
-          }}
-        >
-          Details
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={Eye}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/admin/employees/${row?.id || 'emp_01'}`);
+            }}
+          >
+            View Details
+          </Button>
+        </div>
       ),
     },
   ];
 
   return (
     <PageContainer
-      title="Employee Directory"
-      subtitle="Manage your workforce profiles, roles, departments, and onboarding records."
+      title="Workforce Directory"
+      subtitle="Manage employee records, organizational roles, and directory profiles."
       action={
         <Button
           variant="primary"
           icon={UserPlus}
           onClick={() => setModalOpen(true)}
         >
-          Add New Employee
+          Add Employee
         </Button>
       }
     >
-      {/* Search & Filter Controls */}
-      <Card style={{ marginBottom: '1.5rem', padding: '1rem 1.5rem' }}>
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div style={{ width: '100%', maxWidth: '360px' }}>
-            <Input
-              icon={Search}
-              placeholder="Search by name, role, email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="flex flex-col gap-6">
+        {/* Controls Bar: Search + Department Filter */}
+        <div
+          className="glass-panel flex items-center justify-between gap-4 flex-wrap"
+          style={{
+            padding: '1rem 1.25rem',
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: '#0A0A0F',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
+        >
+          <div className="flex items-center gap-3 flex-1 min-w-[280px]">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: '#040407',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 'var(--radius-md)',
+                padding: '0.5rem 0.875rem',
+                flex: 1,
+              }}
+            >
+              <Search size={16} style={{ color: '#64748B' }} />
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search employees by name, email, or role..."
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  color: '#F8FAFC',
+                  fontSize: '0.875rem',
+                  width: '100%',
+                }}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-muted flex items-center gap-1">
-              <Filter size={14} /> Department:
-            </span>
+            <Filter size={16} style={{ color: '#64748B' }} />
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
               style={{
-                backgroundColor: 'var(--bg-surface-elevated)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-primary)',
-                padding: '0.5rem 1rem',
+                backgroundColor: '#040407',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: 'var(--radius-md)',
-                fontSize: '0.8125rem',
+                padding: '0.5rem 0.875rem',
+                color: '#F8FAFC',
+                fontSize: '0.875rem',
                 outline: 'none',
               }}
             >
-              <option value="all">All Departments ({employees.length})</option>
-              {DEPARTMENTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
+              <option value="all">All Departments ({safeEmployeeList.length})</option>
+              {DEPARTMENTS.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
               ))}
             </select>
           </div>
         </div>
-      </Card>
 
-      {/* Directory Table */}
-      <Card>
-        <Table
-          columns={columns}
-          data={filteredEmployees}
-          onRowClick={(row) => navigate(`/admin/employees/${row.id}`)}
-        />
-      </Card>
+        {/* Directory Table */}
+        <Card noPadding>
+          <Table
+            columns={columns}
+            data={filteredEmployees}
+            loading={loading}
+            emptyMessage={
+              searchTerm
+                ? `No workforce members matching "${searchTerm}"`
+                : 'No employees found in directory.'
+            }
+            onRowClick={(row) => navigate(`/admin/employees/${row?.id || 'emp_01'}`)}
+          />
+        </Card>
+      </div>
 
       {/* Add Employee Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="Onboard New Employee"
-        subtitle="Create an employee profile and generate login access"
+        title="Add New Employee"
+        subtitle="Provision credentials and assign organizational roles."
       >
         <form onSubmit={handleAddEmployee} className="flex flex-col gap-4">
           <Input
-            label="Full Name"
+            label="Full Legal Name"
             value={newEmployee.name}
             onChange={(e) => setNewEmployee({ ...newEmployee, name: e.target.value })}
-            placeholder="e.g. Jordan Hayes"
+            placeholder="e.g. Jordan Miller"
             required
+            autoFocus
           />
 
           <Input
-            label="Work Email"
+            label="Corporate Email"
             type="email"
             value={newEmployee.email}
             onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-            placeholder="jordan.hayes@dayflow.os"
+            placeholder="jordan.miller@dayflow.internal"
             required
           />
 
@@ -244,32 +309,24 @@ export const Employees = () => {
               label="Department"
               value={newEmployee.department}
               onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
-              options={DEPARTMENTS}
+              options={DEPARTMENTS.map((d) => ({ value: d, label: d }))}
             />
+
             <Input
               label="Designation / Role"
               value={newEmployee.role}
               onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
-              placeholder="e.g. Frontend Engineer"
+              placeholder="e.g. Senior Backend Engineer"
               required
             />
           </div>
-
-          <Input
-            label="Monthly Base Salary ($)"
-            type="number"
-            value={newEmployee.salary}
-            onChange={(e) => setNewEmployee({ ...newEmployee, salary: e.target.value })}
-            placeholder="8500"
-            required
-          />
 
           <div className="flex justify-end gap-3" style={{ marginTop: '1rem' }}>
             <Button variant="ghost" size="sm" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
             <Button type="submit" variant="primary" size="sm">
-              Create Employee Profile
+              Provision Account
             </Button>
           </div>
         </form>

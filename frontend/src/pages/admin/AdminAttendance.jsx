@@ -42,13 +42,25 @@ export const AdminAttendance = () => {
     setLoading(true);
     try {
       const data = await attendanceService.getOrganizationAttendance({ date, department: selectedDept });
-      setLogs(data);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.records)
+        ? data.records
+        : Array.isArray(data?.data)
+        ? data.data
+        : [];
+      setLogs(list);
+    } catch (err) {
+      setLogs([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredLogs = logs.filter((item) => {
+  const safeLogs = Array.isArray(logs) ? logs : [];
+
+  const filteredLogs = safeLogs.filter((item) => {
+    if (!item) return false;
     if (selectedDept === 'all') return true;
     return item.department === selectedDept;
   });
