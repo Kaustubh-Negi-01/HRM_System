@@ -222,8 +222,41 @@ const askCopilot = async (question) => {
     answer = `DayFlow is tracking ${pulse.totalEmployees} employees today. Current attendance is ${pulse.attendancePercentage}% (${pulse.presentToday} present, ${pulse.absentToday} absent) with ${pulse.riskLevel} workforce risk level.`;
   }
 
-  // Optional AI enhancement if OpenAI API key is configured
-  if (env.OPENAI_API_KEY) {
+  // Gemini AI enhancement using provided API key
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.AI_API_KEY || env.GEMINI_API_KEY;
+  if (geminiKey) {
+    try {
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `You are DayFlow HR Copilot, an enterprise workforce intelligence AI. Answer this HR question concisely in 1-2 sentences using the verified real HRMS data:\n\nQuestion: "${question}"\nVerified HR Context: ${JSON.stringify(supportingData)}\nCalculated Baseline: "${answer}"`
+                  }
+                ]
+              }
+            ],
+            generationConfig: { maxOutputTokens: 250, temperature: 0.3 }
+          })
+        }
+      );
+
+      if (geminiRes.ok) {
+        const gData = await geminiRes.json();
+        const geminiText = gData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (geminiText) {
+          answer = geminiText;
+        }
+      }
+    } catch (gErr) {
+      console.warn('[Copilot] Gemini API call fallback to local analysis:', gErr.message);
+    }
+  } else if (env.OPENAI_API_KEY) {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',

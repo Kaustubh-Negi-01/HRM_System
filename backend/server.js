@@ -43,6 +43,18 @@ if (env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Root redirect to Frontend portal for browser users
+app.get('/', (req, res) => {
+  if (req.accepts('html')) {
+    return res.redirect(env.FRONTEND_URL || 'http://localhost:3000');
+  }
+  return sendSuccess(res, {
+    service: 'DayFlow Intelligent Workforce OS Backend API',
+    frontend: env.FRONTEND_URL || 'http://localhost:3000',
+    docs: '/api/health',
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   return sendSuccess(res, {
