@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const setUser = (newUser) => {
     setUserState(newUser);
@@ -20,19 +20,20 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('dayflow_user', JSON.stringify(newUser));
     } else {
       localStorage.removeItem('dayflow_user');
+      localStorage.removeItem('dayflow_token');
     }
   };
 
   const initAuth = async () => {
+    const token = localStorage.getItem('dayflow_token');
+    if (!token) return;
     try {
       const currentUser = await authService.getCurrentUser();
       if (currentUser) {
         setUser(currentUser);
       }
     } catch (err) {
-      console.warn('Initial auth check resolved with cached user or guest');
-    } finally {
-      setLoading(false);
+      console.warn('Initial auth check resolved with cached user');
     }
   };
 

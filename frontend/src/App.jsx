@@ -30,9 +30,10 @@ import HRCopilot from './pages/admin/HRCopilot';
 const RootRedirect = () => {
   const { user, isAuthenticated, loading } = React.useContext(AuthContext);
 
-  if (loading) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (user?.role === 'admin' || user?.role === 'hr') {
+  if (loading && !user) return null;
+  if (!isAuthenticated && !user) return <Navigate to="/login" replace />;
+  const role = (user?.role || 'admin').toLowerCase();
+  if (role === 'admin' || role === 'hr') {
     return <Navigate to="/admin" replace />;
   }
   return <Navigate to="/employee" replace />;

@@ -20,7 +20,7 @@ export const ProtectedRoute = ({
     }
   })();
 
-  if (loading) {
+  if (loading && !currentUser) {
     return (
       <div
         style={{
@@ -28,8 +28,8 @@ export const ProtectedRoute = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: 'var(--bg-canvas, #090D16)',
-          color: 'var(--primary, #6366F1)',
+          backgroundColor: '#090D16',
+          color: '#6366F1',
         }}
       >
         <Loader size="lg" text="Authenticating..." />

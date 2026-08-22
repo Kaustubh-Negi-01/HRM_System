@@ -42,11 +42,11 @@ export const Login = () => {
 
     try {
       const res = await login({ email, password, role: selectedRole });
-      const role = (res?.user?.role || res?.role || selectedRole).toLowerCase();
-      if (role === 'admin' || role === 'hr') {
-        navigate('/admin');
+      const userRole = (res?.user?.role || res?.role || selectedRole || 'admin').toLowerCase();
+      if (userRole === 'admin' || userRole === 'hr') {
+        navigate('/admin', { replace: true });
       } else {
-        navigate('/employee');
+        navigate('/employee', { replace: true });
       }
     } catch (err) {
       setError(err.message || 'Failed to sign in. Please verify your credentials.');
