@@ -15,6 +15,9 @@ import {
   Users,
   X,
   UserPlus,
+  KeyRound,
+  HelpCircle,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const Login = () => {
@@ -23,11 +26,20 @@ export const Login = () => {
   const [selectedRole, setSelectedRole] = useState('admin');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // Google Modal States
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [signingGoogleUser, setSigningGoogleUser] = useState(null);
-  const [error, setError] = useState('');
+
+  // Forgot Password Modal States
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -87,7 +99,7 @@ export const Login = () => {
     e.preventDefault();
     if (!customGoogleEmail.trim()) return;
     const namePart = customGoogleEmail.split('@')[0];
-    const derivedName = namePart.split('.').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ') || 'Google User';
+    const derivedName = namePart.split('.').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ') || 'Google User';
     handleGoogleAccountLogin({
       name: derivedName,
       email: customGoogleEmail.trim(),
@@ -96,6 +108,22 @@ export const Login = () => {
       title: 'Member of Technical Staff',
       avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(derivedName)}&background=6366F1&color=fff`,
     });
+  };
+
+  const handlePasswordResetSubmit = (e) => {
+    e.preventDefault();
+    if (!resetEmail.trim() || !newPassword.trim()) return;
+    setResetLoading(true);
+    setTimeout(() => {
+      setResetLoading(false);
+      setResetSuccess(true);
+      setPassword(newPassword);
+      setEmail(resetEmail);
+      setTimeout(() => {
+        setForgotModalOpen(false);
+        setResetSuccess(false);
+      }, 1500);
+    }, 800);
   };
 
   const GOOGLE_ACCOUNTS = [
@@ -397,12 +425,29 @@ export const Login = () => {
             </div>
 
             <div>
-              <label
-                className="text-xs font-semibold text-secondary"
-                style={{ display: 'block', marginBottom: '0.375rem' }}
-              >
-                Password
-              </label>
+              <div className="flex items-center justify-between" style={{ marginBottom: '0.375rem' }}>
+                <label className="text-xs font-semibold text-secondary">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetEmail(email);
+                    setForgotModalOpen(true);
+                  }}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--primary)',
+                    fontSize: '0.75rem',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
               <div
                 style={{
                   display: 'flex',
@@ -697,6 +742,142 @@ export const Login = () => {
                 <UserPlus size={14} />
                 <span>Use another Google account</span>
               </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Forgot / Reset Password Modal */}
+      {forgotModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem',
+          }}
+        >
+          <div
+            className="animate-scale-in"
+            style={{
+              width: '100%',
+              maxWidth: '420px',
+              backgroundColor: '#111827',
+              color: '#F8FAFC',
+              borderRadius: '16px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              padding: '1.75rem',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ marginBottom: '1.25rem' }}>
+              <div className="flex items-center gap-2">
+                <KeyRound size={20} style={{ color: 'var(--primary)' }} />
+                <h3 className="text-base font-bold text-primary">Reset Account Password</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotModalOpen(false);
+                  setResetSuccess(false);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {resetSuccess ? (
+              <div
+                className="flex flex-col items-center text-center animate-fade-in"
+                style={{ padding: '1.5rem 0' }}
+              >
+                <CheckCircle2 size={42} style={{ color: 'var(--success)', marginBottom: '0.75rem' }} />
+                <h4 className="text-sm font-bold text-primary">Password Reset Successfully!</h4>
+                <p className="text-xs text-muted" style={{ marginTop: '0.25rem' }}>
+                  Your password has been updated. Logging in with new credentials...
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordResetSubmit} className="flex flex-col gap-3">
+                <p className="text-xs text-secondary" style={{ lineHeight: 1.5 }}>
+                  Enter your work email and choose a new password to restore access to your DayFlow account.
+                </p>
+
+                <div>
+                  <label className="text-xs font-semibold text-secondary" style={{ display: 'block', marginBottom: '0.375rem' }}>
+                    Work Email
+                  </label>
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="name@dayflow.internal"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.625rem 0.875rem',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#F8FAFC',
+                      fontSize: '0.8125rem',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-semibold text-secondary" style={{ display: 'block', marginBottom: '0.375rem' }}>
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password (e.g. Password123!)"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.625rem 0.875rem',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      color: '#F8FAFC',
+                      fontSize: '0.8125rem',
+                      outline: 'none',
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  style={{
+                    marginTop: '0.75rem',
+                    padding: '0.75rem',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+                    color: '#FFFFFF',
+                    fontSize: '0.8125rem',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: resetLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {resetLoading ? 'Updating Credentials...' : 'Save New Password & Continue'}
+                </button>
+              </form>
             )}
           </div>
         </div>
