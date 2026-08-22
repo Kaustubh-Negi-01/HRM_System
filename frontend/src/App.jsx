@@ -1,93 +1,100 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import AuthProvider, { AuthContext } from './features/auth/auth.context';
+import ProtectedRoute from './components/layout/ProtectedRoute';
+import Sidebar from './components/layout/Sidebar';
+import Topbar from './components/layout/Topbar';
 
-import { AdminLayout, EmployeeLayout, AuthLayout } from './layout';
+// Auth Pages
 import Login from './pages/auth/Login';
+import Signup from './pages/auth/Signup';
+
+// Employee Pages
+import EmployeeDashboard from './pages/employee/EmployeeDashboard';
+import EmployeeAttendance from './pages/employee/EmployeeAttendance';
+import EmployeeLeave from './pages/employee/EmployeeLeave';
+import EmployeePayroll from './pages/employee/EmployeePayroll';
+import EmployeeProfile from './pages/employee/EmployeeProfile';
+
+// Admin Pages & Key Differentiators
 import AdminDashboard from './pages/admin/AdminDashboard';
-import Styleguide from './pages/admin/Styleguide';
-import PageContainer from './components/layout/PageContainer';
-import { EmptyState } from './components/ui';
+import Employees from './pages/admin/Employees';
+import EmployeeDetails from './pages/admin/EmployeeDetails';
+import AdminAttendance from './pages/admin/AdminAttendance';
+import LeaveApprovals from './pages/admin/LeaveApprovals';
+import PayrollManagement from './pages/admin/PayrollManagement';
+import WorkforcePulse from './pages/admin/WorkforcePulse';
+import LeaveImpact from './pages/admin/LeaveImpact';
+import HRCopilot from './pages/admin/HRCopilot';
 
-// Placeholder Component for Saksham to build onto
-const PagePlaceholder = ({ title, subtitle }) => (
-  <PageContainer title={title} subtitle={subtitle}>
-    <EmptyState
-      title={`${title} Module`}
-      description={`This module is connected to the Dayflow design system and ready for feature implementation by Saksham.`}
-    />
-  </PageContainer>
-);
-
-export const App = () => {
+// Master App Shell with Sidebar & Topbar
+const AppLayout = () => {
   return (
-    <Routes>
-      {/* Authentication */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-      </Route>
-
-      {/* Admin Protected Routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="design" element={<Styleguide />} />
-        <Route
-          path="employees"
-          element={<PagePlaceholder title="Employees Directory" subtitle="Manage company workforce and role assignments" />}
-        />
-        <Route
-          path="attendance"
-          element={<PagePlaceholder title="Attendance Records" subtitle="Daily presence, check-in logs, and shift tracking" />}
-        />
-        <Route
-          path="leave-approvals"
-          element={<PagePlaceholder title="Leave Approvals" subtitle="Review incoming employee leave requests and impact scores" />}
-        />
-        <Route
-          path="workforce-pulse"
-          element={<PagePlaceholder title="Workforce Pulse" subtitle="Live analytics on workforce health, attendance rate, and leave load" />}
-        />
-        <Route
-          path="leave-impact"
-          element={<PagePlaceholder title="Smart Leave Impact" subtitle="Predictive team coverage simulator and risk analysis" />}
-        />
-        <Route
-          path="hr-copilot"
-          element={<PagePlaceholder title="HR Copilot" subtitle="Conversational workforce intelligence assistant" />}
-        />
-        <Route
-          path="payroll"
-          element={<PagePlaceholder title="Payroll Management" subtitle="Disbursements, salary structures, and tax deductions" />}
-        />
-      </Route>
-
-      {/* Employee Protected Routes */}
-      <Route path="/employee" element={<EmployeeLayout />}>
-        <Route
-          index
-          element={<PagePlaceholder title="My Dashboard" subtitle="Personal workforce overview and recent requests" />}
-        />
-        <Route
-          path="profile"
-          element={<PagePlaceholder title="My Profile" subtitle="Personal details, emergency contacts, and job information" />}
-        />
-        <Route
-          path="attendance"
-          element={<PagePlaceholder title="My Attendance" subtitle="Clock-in history and timesheets" />}
-        />
-        <Route
-          path="leave"
-          element={<PagePlaceholder title="My Leave Requests" subtitle="Apply for leave and track approval status" />}
-        />
-        <Route
-          path="payroll"
-          element={<PagePlaceholder title="My Payslips" subtitle="Monthly salary slips and tax breakdown" />}
-        />
-      </Route>
-
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/admin" replace />} />
-    </Routes>
+    <div className="app-container">
+      <Sidebar />
+      <div className="main-content">
+        <Topbar />
+        <Outlet />
+      </div>
+    </div>
   );
 };
+
+// Root index redirection helper
+const RootRedirect = () => {
+  const { user, isAuthenticated, loading } = React.useContext(AuthContext);
+
+  if (loading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role === 'admin' || user?.role === 'hr') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  return <Navigate to="/employee/dashboard" replace />;
+};
+
+export function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+
+          {/* Protected Employee Workspace */}
+          <Route element={<ProtectedRoute allowedRoles={['employee', 'admin', 'hr', 'manager']} />}>
+            <Route element={<AppLayout />}>
+              <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
+              <Route path="/employee/attendance" element={<EmployeeAttendance />} />
+              <Route path="/employee/leave" element={<EmployeeLeave />} />
+              <Route path="/employee/payroll" element={<EmployeePayroll />} />
+              <Route path="/employee/profile" element={<EmployeeProfile />} />
+            </Route>
+          </Route>
+
+          {/* Protected Admin & Workforce Intelligence Suite */}
+          <Route element={<ProtectedRoute allowedRoles={['admin', 'hr', 'manager']} />}>
+            <Route element={<AppLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/admin/employees" element={<Employees />} />
+              <Route path="/admin/employees/:id" element={<EmployeeDetails />} />
+              <Route path="/admin/attendance" element={<AdminAttendance />} />
+              <Route path="/admin/leave-approvals" element={<LeaveApprovals />} />
+              <Route path="/admin/payroll" element={<PayrollManagement />} />
+              {/* 3 Key Differentiators */}
+              <Route path="/admin/workforce-pulse" element={<WorkforcePulse />} />
+              <Route path="/admin/leave-impact" element={<LeaveImpact />} />
+              <Route path="/admin/copilot" element={<HRCopilot />} />
+            </Route>
+          </Route>
+
+          {/* Root and Catch-All */}
+          <Route path="/" element={<RootRedirect />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
 
 export default App;

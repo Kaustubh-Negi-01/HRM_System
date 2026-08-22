@@ -1,284 +1,203 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import PageContainer from '../../components/layout/PageContainer';
+import StatCard from '../../components/dashboard/StatCard';
+import AlertCard from '../../components/dashboard/AlertCard';
+import AttendanceChart from '../../components/dashboard/AttendanceChart';
+import ActivityList from '../../components/dashboard/ActivityList';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 import {
   Users,
-  CheckCircle2,
+  CalendarCheck,
   CalendarDays,
-  Clock,
-  Download,
-  Plus,
-  Eye,
-  Check,
-  X,
+  CreditCard,
+  Activity,
+  GitBranch,
+  Bot,
   Sparkles,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react';
-import {
-  Button,
-  Card,
-  Table,
-} from '../../components/ui';
-import {
-  StatusBadge,
-  RiskBadge,
-  EmployeeAvatar,
-} from '../../components/shared';
-import {
-  StatCard,
-  AttendanceChart,
-  ActivityList,
-} from '../../components/dashboard';
-import { PageHeader } from '../../components/layout/PageContainer';
-
-const MOCK_STATS = {
-  totalEmployees: { value: '248', delta: '+12%', direction: 'up', subtitle: 'vs last month' },
-  presentToday: { value: '231', delta: '94%', direction: 'up', subtitle: 'attendance rate' },
-  onLeave: { value: '17', delta: '-3%', direction: 'down', subtitle: 'vs yesterday' },
-  pendingApprovals: { value: '12', delta: 'Requires Review', direction: 'flat', subtitle: '3 high risk' },
-};
-
-const MOCK_ACTIVITIES = [
-  { id: 1, name: 'Priya Sharma', action: 'applied for sick leave', target: '(Aug 24-25)', timestamp: '10m ago', badge: 'PENDING', badgeVariant: 'warning' },
-  { id: 2, name: 'Rahul Verma', action: 'clocked in at 09:02 AM', target: '', timestamp: '45m ago', badge: 'PRESENT', badgeVariant: 'success' },
-  { id: 3, name: 'Finance System', action: 'processed July payroll batch', target: '(#PAY-2026-07)', timestamp: '2h ago', badge: 'PAID', badgeVariant: 'success' },
-  { id: 4, name: 'Aisha Khan', action: 'joined as Senior PM in Product team', target: '', timestamp: '4h ago', badge: 'ACTIVE', badgeVariant: 'info' },
-  { id: 5, name: 'Vikram Singh', action: 'leave request approved by HR', target: '', timestamp: '6h ago', badge: 'APPROVED', badgeVariant: 'success' },
-];
-
-const MOCK_LEAVE_REQUESTS = [
-  {
-    id: 'LR-101',
-    name: 'Priya Sharma',
-    email: 'priya.s@dayflow.io',
-    dept: 'Engineering',
-    role: 'Staff Engineer',
-    type: 'Sick Leave',
-    dates: 'Aug 24 – Aug 26',
-    days: '3 days',
-    status: 'Pending',
-    risk: 'High',
-  },
-  {
-    id: 'LR-102',
-    name: 'Rahul Verma',
-    email: 'rahul.v@dayflow.io',
-    dept: 'Design',
-    role: 'Product Designer',
-    type: 'Casual Leave',
-    dates: 'Aug 28 – Aug 29',
-    days: '2 days',
-    status: 'Pending',
-    risk: 'Low',
-  },
-  {
-    id: 'LR-103',
-    name: 'Aisha Khan',
-    email: 'aisha.k@dayflow.io',
-    dept: 'Product',
-    role: 'Product Manager',
-    type: 'Earned Leave',
-    dates: 'Sep 01 – Sep 05',
-    days: '5 days',
-    status: 'Pending',
-    risk: 'Medium',
-  },
-  {
-    id: 'LR-104',
-    name: 'Vikram Singh',
-    email: 'vikram.s@dayflow.io',
-    dept: 'Engineering',
-    role: 'Backend Lead',
-    type: 'Vacation',
-    dates: 'Sep 10 – Sep 15',
-    days: '6 days',
-    status: 'Approved',
-    risk: 'Low',
-  },
-  {
-    id: 'LR-105',
-    name: 'Devon Miles',
-    email: 'devon.m@dayflow.io',
-    dept: 'Support',
-    role: 'Support Lead',
-    type: 'Emergency',
-    dates: 'Aug 22 – Aug 23',
-    days: '2 days',
-    status: 'Rejected',
-    risk: 'Critical',
-  },
-];
+import workforceService from '../../features/workforce/workforce.service';
 
 export const AdminDashboard = () => {
-  const [demoLoading, setDemoLoading] = useState(false);
+  const navigate = useNavigate();
+  const [pulseData, setPulseData] = useState(null);
 
-  const leaveTableColumns = [
-    {
-      key: 'employee',
-      header: 'Employee',
-      render: (row) => (
-        <EmployeeAvatar
-          name={row.name}
-          subtitle={row.dept}
-          status={row.status === 'Approved' ? 'leave' : 'present'}
-          size="sm"
-        />
-      ),
-    },
-    { key: 'type', header: 'Leave Type' },
-    { key: 'dates', header: 'Date Range' },
-    { key: 'days', header: 'Duration', align: 'center', numeric: true },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (row) => <StatusBadge status={row.status} />,
-    },
-    {
-      key: 'risk',
-      header: 'Staffing Risk',
-      render: (row) => <RiskBadge level={row.risk} size="sm" />,
-    },
-    {
-      key: 'actions',
-      header: 'Actions',
-      align: 'right',
-      render: (row) => (
-        <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<Eye size={14} />}
-            title="View Details"
-            aria-label="View Details"
-          />
-          {row.status === 'Pending' && (
-            <>
-              <Button
-                variant="success"
-                size="sm"
-                icon={<Check size={14} />}
-                title="Approve"
-                aria-label="Approve"
-              />
-              <Button
-                variant="danger"
-                size="sm"
-                icon={<X size={14} />}
-                title="Reject"
-                aria-label="Reject"
-              />
-            </>
-          )}
-        </div>
-      ),
-    },
-  ];
+  useEffect(() => {
+    loadPulse();
+  }, []);
+
+  const loadPulse = async () => {
+    try {
+      const data = await workforceService.getWorkforcePulse();
+      setPulseData(data);
+    } catch (err) {
+      // Handled by service
+    }
+  };
 
   return (
-    <div className="page stack-lg">
-      <PageHeader
-        title="Good morning, Admin 👋"
-        subtitle="Here's a real-time overview of workforce attendance, staffing risks, and pending approvals."
-        actions={
-          <div className="row">
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={<Sparkles size={14} />}
-              onClick={() => setDemoLoading(!demoLoading)}
-            >
-              {demoLoading ? 'Show Normal' : 'Simulate Loading'}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={<Download size={14} />}
-              onClick={() => alert('Exporting Report...')}
-            >
-              Export Report
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<Plus size={14} />}
-              onClick={() => alert('Add Employee modal triggered')}
-            >
-              Add Employee
-            </Button>
+    <PageContainer
+      title="Executive Workforce Command"
+      subtitle="Live enterprise operational status, workforce health intelligence, and AI management."
+      action={
+        <Button
+          variant="primary"
+          icon={Bot}
+          onClick={() => navigate('/admin/copilot')}
+        >
+          Ask HR Copilot
+        </Button>
+      }
+    >
+      {/* 3 Key Differentiators Feature Hero Banner */}
+      <div className="grid grid-cols-3 gap-4" style={{ marginBottom: '2rem' }}>
+        {/* Differentiator 1 */}
+        <Card
+          variant="pulse"
+          className="interactive"
+          onClick={() => navigate('/admin/workforce-pulse')}
+          style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%)' }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span className="pulse-indicator" />
+              <h3 className="text-sm font-extrabold text-cyan uppercase tracking-wider">
+                Workforce Pulse™
+              </h3>
+            </div>
+            <Activity size={20} style={{ color: 'var(--pulse-cyan)' }} />
           </div>
-        }
-      />
+          <p className="text-2xl font-black text-primary" style={{ marginTop: '0.5rem' }}>
+            {pulseData?.healthIndex || 88}<span className="text-sm font-normal text-muted">/100 Health Index</span>
+          </p>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.25rem' }}>
+            Live burnout & retention risk radar across 5 departments.
+          </p>
+          <div className="flex items-center gap-1 text-xs font-bold text-cyan" style={{ marginTop: '0.75rem' }}>
+            <span>Explore Pulse Feed</span>
+            <ArrowRight size={12} />
+          </div>
+        </Card>
 
-      {/* Row of 4 StatCards */}
-      <div className="grid-4">
+        {/* Differentiator 2 */}
+        <Card
+          className="interactive"
+          onClick={() => navigate('/admin/leave-impact')}
+          style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%)' }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--primary)' }} />
+              <h3 className="text-sm font-extrabold text-indigo uppercase tracking-wider">
+                Smart Leave Impact™
+              </h3>
+            </div>
+            <GitBranch size={20} style={{ color: 'var(--primary)' }} />
+          </div>
+          <p className="text-2xl font-black text-primary" style={{ marginTop: '0.5rem' }}>
+            3 Active Simulations
+          </p>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.25rem' }}>
+            Simulate staffing deficit and milestone risks before approving leave.
+          </p>
+          <div className="flex items-center gap-1 text-xs font-bold text-indigo" style={{ marginTop: '0.75rem' }}>
+            <span>Simulate Coverage</span>
+            <ArrowRight size={12} />
+          </div>
+        </Card>
+
+        {/* Differentiator 3 */}
+        <Card
+          className="interactive"
+          onClick={() => navigate('/admin/copilot')}
+          style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%)' }}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} style={{ color: '#C084FC' }} />
+              <h3 className="text-sm font-extrabold uppercase tracking-wider" style={{ color: '#C084FC' }}>
+                AI HR Copilot
+              </h3>
+            </div>
+            <Bot size={20} style={{ color: '#C084FC' }} />
+          </div>
+          <p className="text-2xl font-black text-primary" style={{ marginTop: '0.5rem' }}>
+            Natural Language
+          </p>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.25rem' }}>
+            Ask complex questions over real HRMS attendance, leave, & payroll data.
+          </p>
+          <div className="flex items-center gap-1 text-xs font-bold" style={{ marginTop: '0.75rem', color: '#C084FC' }}>
+            <span>Start Conversation</span>
+            <ArrowRight size={12} />
+          </div>
+        </Card>
+      </div>
+
+      {/* Primary KPI Metrics */}
+      <div className="grid grid-cols-4 gap-4" style={{ marginBottom: '2rem' }}>
         <StatCard
-          label="Total Employees"
-          value={MOCK_STATS.totalEmployees.value}
-          delta={MOCK_STATS.totalEmployees.delta}
-          deltaDirection={MOCK_STATS.totalEmployees.direction}
-          deltaText={MOCK_STATS.totalEmployees.subtitle}
-          icon={<Users size={18} />}
-          iconVariant="primary"
-          loading={demoLoading}
+          title="Total Workforce"
+          value="52 Active"
+          change="+4 this quarter"
+          changeType="positive"
+          icon={Users}
+          iconColor="var(--primary)"
+          iconBg="var(--primary-bg)"
         />
         <StatCard
-          label="Present Today"
-          value={MOCK_STATS.presentToday.value}
-          delta={MOCK_STATS.presentToday.delta}
-          deltaDirection={MOCK_STATS.presentToday.direction}
-          deltaText={MOCK_STATS.presentToday.subtitle}
-          icon={<CheckCircle2 size={18} />}
-          iconVariant="success"
-          loading={demoLoading}
+          title="Today's Attendance"
+          value="94.2%"
+          change="48 Present / 3 Leave"
+          changeType="positive"
+          icon={CalendarCheck}
+          iconColor="var(--success)"
+          iconBg="var(--success-bg)"
         />
         <StatCard
-          label="On Leave"
-          value={MOCK_STATS.onLeave.value}
-          delta={MOCK_STATS.onLeave.delta}
-          deltaDirection={MOCK_STATS.onLeave.direction}
-          deltaText={MOCK_STATS.onLeave.subtitle}
-          icon={<CalendarDays size={18} />}
-          iconVariant="warning"
-          loading={demoLoading}
+          title="Pending Approvals"
+          value="3 Requests"
+          change="2 Critical Overlaps"
+          changeType="negative"
+          icon={CalendarDays}
+          iconColor="var(--warning)"
+          iconBg="var(--warning-bg)"
         />
         <StatCard
-          label="Pending Approvals"
-          value={MOCK_STATS.pendingApprovals.value}
-          delta={MOCK_STATS.pendingApprovals.delta}
-          deltaDirection={MOCK_STATS.pendingApprovals.direction}
-          deltaText={MOCK_STATS.pendingApprovals.subtitle}
-          icon={<Clock size={18} />}
-          iconVariant="danger"
-          loading={demoLoading}
+          title="August Payroll Run"
+          value="$382,400"
+          change="Disbursing Aug 31"
+          changeType="neutral"
+          icon={CreditCard}
+          iconColor="var(--pulse-cyan)"
+          iconBg="var(--pulse-cyan-bg)"
         />
       </div>
 
-      {/* 2-Column Grid: Attendance Overview & Recent Activity */}
-      <div className="grid-2-1">
-        <AttendanceChart loading={demoLoading} />
-        <ActivityList
-          items={MOCK_ACTIVITIES}
-          title="Recent Activity"
-          subtitle="Realtime updates across company"
+      {/* Intelligence Alert Banner */}
+      <div style={{ marginBottom: '2rem' }}>
+        <AlertCard
+          type="pulse"
+          title="AI Workforce Alert: Concurrent Leave Conflict Detected"
+          message="Engineering squad has 2 overlapping leave applications (Alex Mercer & David Miller) between Sept 1 – Sept 4. Projected team coverage will drop to 58%, threatening the v2.5 Infrastructure Migration milestone."
+          actionText="Run Smart Leave Simulation & Mitigate"
+          actionLink="/admin/leave-impact"
         />
       </div>
 
-      {/* Pending Leave Requests Table */}
-      <Card
-        title="Pending Leave Requests & Impact Risk"
-        subtitle="Review staff leave requests with projected workforce impact calculations"
-        actions={
-          <Button variant="ghost" size="sm">
-            View All Requests
-          </Button>
-        }
-      >
-        <Table
-          columns={leaveTableColumns}
-          data={MOCK_LEAVE_REQUESTS}
-          loading={demoLoading}
-          pagination
-          pageSize={5}
-        />
-      </Card>
-    </div>
+      {/* Charts & Activity Stream */}
+      <div className="grid grid-cols-3 gap-6">
+        <div style={{ gridColumn: 'span 2' }}>
+          <AttendanceChart />
+        </div>
+        <div>
+          <ActivityList />
+        </div>
+      </div>
+    </PageContainer>
   );
 };
 
