@@ -1,11 +1,11 @@
-export function formatCurrency(amount, currency = 'USD') {
-  if (amount === undefined || amount === null) return '$0.00';
-  return new Intl.NumberFormat('en-US', {
+export function formatCurrency(amount, currency = 'INR') {
+  if (amount === undefined || amount === null || isNaN(Number(amount))) return '₹0';
+  const num = Number(amount);
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(amount);
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(num);
 }
 
 export function formatDate(dateString, options = {}) {
@@ -19,17 +19,16 @@ export function formatDate(dateString, options = {}) {
     day: 'numeric',
     ...options,
   };
-  return new Intl.DateTimeFormat('en-US', defaultOptions).format(date);
+  return new Intl.DateTimeFormat('en-IN', defaultOptions).format(date);
 }
 
 export function formatTime(timeString) {
   if (!timeString) return '—';
   const date = new Date(timeString);
   if (isNaN(date.getTime())) {
-    // If it's in HH:MM format already
     return timeString;
   }
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
     hour12: true,

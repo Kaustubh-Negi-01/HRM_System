@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Menu,
   Bell,
-  User,
-  Settings,
-  LogOut,
-  Sun,
+  Menu,
   Moon,
-  CheckCircle2,
-  AlertTriangle,
-  DollarSign,
+  Sun,
+  Shield,
+  Settings,
+  User,
+  LogOut,
+  Sparkles,
+  CheckCircle,
   Calendar,
+  AlertTriangle,
+  Receipt,
   X,
-  Database,
-  Cpu,
-  ShieldCheck,
+  CreditCard,
+  Building,
+  CheckCheck,
 } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Dropdown } from '../ui/Dropdown';
@@ -52,7 +54,7 @@ export const Topbar = ({
     {
       id: 'n2',
       title: 'Workforce Pulse Alert',
-      desc: 'High overtime detected in Engineering team.',
+      desc: 'High overtime detected in Engineering squad.',
       time: '35m ago',
       icon: <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />,
       link: '/admin/workforce-pulse',
@@ -60,12 +62,30 @@ export const Topbar = ({
     },
     {
       id: 'n3',
-      title: 'Payroll Disbursal Ready',
-      desc: 'August 2026 cycle ready ($382,400 across 52 employees).',
-      time: '1h ago',
-      icon: <DollarSign size={16} style={{ color: 'var(--success)' }} />,
+      title: 'Department Budget Variance',
+      desc: 'Engineering budget has reached 77% utilization for Q3.',
+      time: '50m ago',
+      icon: <Building size={16} style={{ color: 'var(--primary)' }} />,
       link: '/admin/payroll',
       unread: true,
+    },
+    {
+      id: 'n4',
+      title: 'Payroll Disbursal Ready',
+      desc: 'August 2026 cycle ready (₹25,48,000 across 48 employees).',
+      time: '1h ago',
+      icon: <Receipt size={16} style={{ color: 'var(--success)' }} />,
+      link: '/admin/payroll',
+      unread: true,
+    },
+    {
+      id: 'n5',
+      title: 'Task Deliverable Completed',
+      desc: 'Alex Chen marked "Q3 Cloud Security Compliance Audit" as Done.',
+      time: '2h ago',
+      icon: <CheckCheck size={16} style={{ color: 'var(--success)' }} />,
+      link: '/admin',
+      unread: false,
     },
   ]);
   const notifRef = useRef(null);
@@ -109,7 +129,7 @@ export const Topbar = ({
       onClick: () => {
         const role = (user?.role || '').toLowerCase();
         if (role === 'admin' || role === 'hr') {
-          navigate('/admin/employees');
+          navigate('/admin/profile');
         } else {
           navigate('/employee/profile');
         }
@@ -122,17 +142,11 @@ export const Topbar = ({
       onClick: () => setShowSettings(true),
     },
     {
-      key: 'theme_toggle',
-      label: theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-      icon: theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />,
-      onClick: toggleTheme,
-    },
-    {
-      divider: true,
+      type: 'divider',
     },
     {
       key: 'logout',
-      label: 'Sign Out',
+      label: 'Sign Out of Session',
       icon: <LogOut size={15} />,
       danger: true,
       onClick: onLogout,
@@ -142,61 +156,69 @@ export const Topbar = ({
   return (
     <>
       <header className={`df-topbar ${className}`}>
+        {/* Left Section: Mobile Menu + Title/Breadcrumbs */}
         <div className="df-topbar__left">
           {onMenuClick && (
             <button
               type="button"
-              className="df-topbar__hamburger"
+              className="df-topbar__menu-btn"
               onClick={onMenuClick}
-              aria-label="Open sidebar navigation"
+              aria-label="Toggle navigation menu"
             >
               <Menu size={20} />
             </button>
           )}
 
-          <div className="df-topbar__titles">
-            {Array.isArray(breadcrumbs) && breadcrumbs.length > 0 && (
-              <nav className="df-topbar__breadcrumbs" aria-label="Breadcrumb">
-                {breadcrumbs.map((crumb, idx) => (
-                  <span key={crumb.label || idx} className="df-topbar__crumb">
-                    {crumb.to ? (
-                      <Link to={crumb.to} className="df-topbar__crumb-link">{crumb.label}</Link>
-                    ) : (
-                      <span className="df-topbar__crumb-current">{crumb.label}</span>
-                    )}
-                    {idx < breadcrumbs.length - 1 && (
-                      <span className="df-topbar__crumb-sep">/</span>
-                    )}
-                  </span>
-                ))}
-              </nav>
-            )}
-            {title && <h1 className="df-topbar__title">{title}</h1>}
-          </div>
-        </div>
-
-        <div className="df-topbar__right">
-          {showSearch && (
-            <div className="df-topbar__search">
-              <SearchBar
-                placeholder="Search employees, requests, metrics..."
-                size="sm"
-                onChange={onSearch}
-              />
+          {title && (
+            <div className="df-topbar__headings">
+              <h1 className="df-topbar__title">{title}</h1>
+              {breadcrumbs.length > 0 && (
+                <nav className="df-topbar__breadcrumbs" aria-label="Breadcrumb">
+                  <ol className="df-topbar__breadcrumb-list">
+                    {breadcrumbs.map((crumb, index) => (
+                      <li key={crumb.href || index} className="df-topbar__breadcrumb-item">
+                        {index > 0 && <span className="df-topbar__breadcrumb-sep">/</span>}
+                        {crumb.href ? (
+                          <a href={crumb.href} className="df-topbar__breadcrumb-link">
+                            {crumb.label}
+                          </a>
+                        ) : (
+                          <span className="df-topbar__breadcrumb-current">{crumb.label}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
             </div>
           )}
+        </div>
 
-          {actions && <div className="df-topbar__actions">{actions}</div>}
+        {/* Center: Global Search Bar */}
+        {showSearch && (
+          <div className="df-topbar__center">
+            <SearchBar
+              placeholder="Search employees, payroll records, leave applications..."
+              onSearch={onSearch}
+              size="sm"
+            />
+          </div>
+        )}
+
+        {/* Right Section: Theme Toggle, Notifications, User Menu, Custom Actions */}
+        <div className="df-topbar__right">
+          {actions}
 
           {/* Theme Toggle Button */}
           <button
             type="button"
             className="df-topbar__icon-btn"
             onClick={toggleTheme}
-            aria-label="Toggle dark/light theme"
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle theme"
             style={{
-              color: theme === 'dark' ? '#FBBF24' : '#6366F1',
+              color: theme === 'dark' ? '#FBBF24' : '#38BDF8',
+              transition: 'transform 0.2s ease',
             }}
           >
             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
@@ -207,31 +229,40 @@ export const Topbar = ({
             <button
               type="button"
               className="df-topbar__icon-btn"
-              aria-label="Notifications"
-              title="Notifications"
-              onClick={() => setShowNotifications((prev) => !prev)}
+              onClick={() => setShowNotifications(!showNotifications)}
+              aria-label={`Notifications (${unreadCount} unread)`}
+              style={{ position: 'relative' }}
             >
               <Bell size={18} />
               {unreadCount > 0 && (
-                <span className="df-topbar__badge" aria-label={`${unreadCount} notifications`}>
-                  {unreadCount}
-                </span>
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: '4px',
+                    right: '4px',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--danger)',
+                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.8)',
+                  }}
+                />
               )}
             </button>
 
             {showNotifications && (
               <div
-                className="glass-panel animate-scale-in"
+                className="animate-scale-in"
                 style={{
                   position: 'absolute',
-                  top: 'calc(100% + 10px)',
+                  top: 'calc(100% + 8px)',
                   right: 0,
-                  width: '340px',
+                  width: '320px',
+                  backgroundColor: '#0A0A0F',
                   borderRadius: 'var(--radius-lg)',
-                  border: '1px solid var(--border)',
-                  backgroundColor: 'var(--bg-surface)',
-                  boxShadow: 'var(--shadow-lg)',
-                  zIndex: 100,
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8)',
+                  zIndex: 200,
                   overflow: 'hidden',
                 }}
               >
@@ -239,10 +270,10 @@ export const Topbar = ({
                   className="flex items-center justify-between"
                   style={{
                     padding: '0.875rem 1rem',
-                    borderBottom: '1px solid var(--border-subtle)',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
                   }}
                 >
-                  <span className="text-xs font-bold text-primary">System Notifications</span>
+                  <span className="text-xs font-bold text-primary">System Notifications ({unreadCount})</span>
                   {unreadCount > 0 && (
                     <button
                       type="button"
@@ -271,23 +302,23 @@ export const Topbar = ({
                       }}
                       style={{
                         padding: '0.75rem 1rem',
-                        borderBottom: '1px solid var(--border-subtle)',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
                         display: 'flex',
                         gap: '0.75rem',
                         cursor: 'pointer',
-                        backgroundColor: n.unread ? 'rgba(99, 102, 241, 0.06)' : 'transparent',
+                        backgroundColor: n.unread ? 'rgba(56, 189, 248, 0.06)' : 'transparent',
                         transition: 'background-color 0.15s ease',
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.12)')}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(56, 189, 248, 0.12)')}
                       onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = n.unread ? 'rgba(99, 102, 241, 0.06)' : 'transparent')
+                        (e.currentTarget.style.backgroundColor = n.unread ? 'rgba(56, 189, 248, 0.06)' : 'transparent')
                       }
                     >
                       <div style={{ marginTop: '2px', flexShrink: 0 }}>{n.icon}</div>
                       <div style={{ flex: 1 }}>
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-bold text-primary">{n.title}</span>
-                          <span className="text-xs text-muted">{n.time}</span>
+                          <span className="text-xs text-muted" style={{ fontSize: '0.6875rem' }}>{n.time}</span>
                         </div>
                         <p className="text-xs text-secondary" style={{ marginTop: '2px', lineHeight: 1.4 }}>
                           {n.desc}
@@ -310,142 +341,71 @@ export const Topbar = ({
                 className="df-topbar__profile-trigger"
                 aria-label="User menu"
               >
-                <Avatar name={user?.name || 'User'} size="sm" />
-                <span className="df-topbar__profile-name">{user?.name || 'User'}</span>
+                <Avatar name={user?.name || 'Saksham Singh'} size="sm" />
+                <span className="df-topbar__profile-name">{user?.name || 'Saksham Singh'}</span>
               </button>
             }
           />
         </div>
       </header>
 
-      {/* Interactive Settings Modal */}
-      <Modal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        title="DayFlow System & Workspace Settings"
-        size="md"
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {/* Appearance Section */}
-          <div
-            style={{
-              padding: '1rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-sm font-bold text-primary">Interface Theme</h4>
-                <p className="text-xs text-secondary" style={{ marginTop: '2px' }}>
-                  Toggle between high-contrast Obsidian Dark and Crisp Slate Light theme.
-                </p>
+      {/* System Settings Modal */}
+      {showSettings && (
+        <Modal
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+          title="System Settings & Infrastructure"
+          subtitle="Configure platform parameters, cloud database, and intelligent telemetry."
+        >
+          <div className="flex flex-col gap-4">
+            <div
+              style={{
+                padding: '1rem',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: '#040407',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-primary">Supabase Cloud PostgreSQL</h4>
+                  <p className="text-xs text-muted">Direct browser & backend real-time database sync</p>
+                </div>
+                <span className="flex items-center gap-1 text-xs font-semibold text-emerald">
+                  <CheckCircle size={14} /> Connected
+                </span>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                icon={theme === 'dark' ? Sun : Moon}
-                onClick={toggleTheme}
-              >
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+
+              <div className="flex items-center justify-between pt-2 border-t border-subtle">
+                <div>
+                  <h4 className="text-xs font-bold text-primary">Google Gemini AI Engine</h4>
+                  <p className="text-xs text-muted">Natural-language HR Copilot & Workforce Pulse</p>
+                </div>
+                <span className="flex items-center gap-1 text-xs font-semibold text-emerald">
+                  <Sparkles size={14} /> Active
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-subtle">
+                <div>
+                  <h4 className="text-xs font-bold text-primary">Current Currency Standard</h4>
+                  <p className="text-xs text-muted">All payroll and budget figures in INR (₹)</p>
+                </div>
+                <span className="text-xs font-mono font-bold text-primary">INR (₹)</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3" style={{ marginTop: '0.5rem' }}>
+              <Button variant="primary" size="sm" onClick={() => setShowSettings(false)}>
+                Done
               </Button>
             </div>
           </div>
-
-          {/* Cloud Database Integration Status */}
-          <div
-            style={{
-              padding: '1rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Database size={20} style={{ color: 'var(--success)' }} />
-                <div>
-                  <h4 className="text-sm font-bold text-primary">Supabase Cloud Database</h4>
-                  <p className="text-xs text-muted">Connected to https://lfjtliopljgnrwklnvlu.supabase.co</p>
-                </div>
-              </div>
-              <span
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: 'var(--radius-full)',
-                  backgroundColor: 'var(--success-bg)',
-                  color: 'var(--success)',
-                  fontSize: '0.6875rem',
-                  fontWeight: 'bold',
-                }}
-              >
-                Active
-              </span>
-            </div>
-          </div>
-
-          {/* Gemini AI Intelligence Status */}
-          <div
-            style={{
-              padding: '1rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Cpu size={20} style={{ color: 'var(--pulse-cyan)' }} />
-                <div>
-                  <h4 className="text-sm font-bold text-primary">Google Gemini 1.5 Flash Copilot</h4>
-                  <p className="text-xs text-muted">Autonomous workforce telemetry synthesis</p>
-                </div>
-              </div>
-              <span
-                style={{
-                  padding: '0.25rem 0.5rem',
-                  borderRadius: 'var(--radius-full)',
-                  backgroundColor: 'var(--pulse-cyan-bg)',
-                  color: 'var(--pulse-cyan)',
-                  fontSize: '0.6875rem',
-                  fontWeight: 'bold',
-                }}
-              >
-                Online
-              </span>
-            </div>
-          </div>
-
-          {/* Active User Session Details */}
-          <div
-            style={{
-              padding: '1rem',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              backgroundColor: 'var(--bg-surface-elevated)',
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <ShieldCheck size={20} style={{ color: 'var(--primary)' }} />
-                <div>
-                  <h4 className="text-sm font-bold text-primary">Signed In Account</h4>
-                  <p className="text-xs text-muted">
-                    {user?.name} ({user?.role}) • {user?.email}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button variant="primary" size="sm" onClick={() => setShowSettings(false)}>
-            Close Settings
-          </Button>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 };

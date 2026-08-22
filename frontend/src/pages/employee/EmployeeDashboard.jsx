@@ -393,7 +393,7 @@ export const EmployeeDashboard = () => {
         />
         <StatCard
           title="Last Net Salary"
-          value="$8,900"
+          value="₹1,29,300"
           description="Disbursed for July 2026"
           icon={CreditCard}
         />

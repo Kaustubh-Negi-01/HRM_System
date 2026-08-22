@@ -238,7 +238,7 @@ export const AdminDashboard = () => {
         />
         <StatCard
           title="August Payroll Run"
-          value="$382,400"
+          value="₹25,48,000"
           change="Disbursing Aug 31"
           changeType="neutral"
           icon={CreditCard}

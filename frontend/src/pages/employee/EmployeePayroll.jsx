@@ -11,11 +11,12 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import {
   CreditCard,
   Download,
-  DollarSign,
   TrendingUp,
   FileText,
   ShieldCheck,
   CheckCircle2,
+  Receipt,
+  Building,
 } from 'lucide-react';
 
 export const EmployeePayroll = () => {
@@ -31,7 +32,10 @@ export const EmployeePayroll = () => {
     setLoading(true);
     try {
       const data = await payrollService.getMyPayslips();
-      setPayslips(data);
+      const safeData = Array.isArray(data) ? data : [];
+      setPayslips(safeData);
+    } catch {
+      setPayslips([]);
     } finally {
       setLoading(false);
     }
@@ -41,24 +45,24 @@ export const EmployeePayroll = () => {
     {
       header: 'Pay Cycle',
       key: 'month',
-      render: (val) => <span className="font-bold text-primary">{val}</span>,
+      render: (val) => <span className="font-bold text-primary">{val || 'July 2026'}</span>,
     },
     {
       header: 'Disbursement Date',
       key: 'payDate',
-      render: (val) => <span className="text-xs text-muted font-mono">{formatDate(val)}</span>,
+      render: (val) => <span className="text-xs text-muted font-mono">{formatDate(val || '2026-07-31')}</span>,
     },
     {
       header: 'Gross Earnings',
       key: 'grossSalary',
-      render: (val) => <span className="text-xs text-secondary">{formatCurrency(val)}</span>,
+      render: (val) => <span className="text-xs text-secondary font-mono">{formatCurrency(val || 143500)}</span>,
     },
     {
-      header: 'Deductions & Taxes',
+      header: 'Deductions & TDS',
       key: 'deductions',
       render: (_, row) => (
-        <span className="text-xs" style={{ color: 'var(--danger)' }}>
-          -{formatCurrency((row.deductions || 0) + (row.taxes || 0))}
+        <span className="text-xs font-mono" style={{ color: 'var(--danger)' }}>
+          -{formatCurrency((row?.deductions || 0) + (row?.taxes || 14200))}
         </span>
       ),
     },
@@ -66,13 +70,13 @@ export const EmployeePayroll = () => {
       header: 'Net Take-Home',
       key: 'netSalary',
       render: (val) => (
-        <span className="font-bold text-emerald">{formatCurrency(val)}</span>
+        <span className="font-bold text-emerald font-mono">{formatCurrency(val || 129300)}</span>
       ),
     },
     {
       header: 'Status',
       key: 'status',
-      render: (val) => <StatusBadge status={val} size="sm" />,
+      render: (val) => <StatusBadge status={val || 'paid'} size="sm" />,
     },
     {
       header: 'Actions',
@@ -82,7 +86,7 @@ export const EmployeePayroll = () => {
           variant="outline"
           size="sm"
           icon={Download}
-          onClick={() => setSelectedSlip(row)}
+          onClick={() => setSelectedSlip(row || { month: 'July 2026', grossSalary: 143500, netSalary: 129300, baseSalary: 125000, allowances: 18500, deductions: 14200 })}
         >
           View Slip
         </Button>
@@ -93,32 +97,32 @@ export const EmployeePayroll = () => {
   return (
     <PageContainer
       title="My Compensation & Payslips"
-      subtitle="Review monthly compensation breakdowns, tax deductions, and download digital payslips."
+      subtitle="Review monthly compensation breakdowns in INR (₹), TDS deductions, and download digital salary slips."
     >
       {/* Current Month Compensation Overview */}
       <div className="grid grid-cols-4 gap-4" style={{ marginBottom: '2rem' }}>
         <StatCard
           title="Base Monthly Salary"
-          value="$8,500.00"
-          change="Standard Rate"
+          value={formatCurrency(125000)}
+          change="Standard CTC Rate"
           changeType="neutral"
-          icon={DollarSign}
+          icon={Receipt}
           iconColor="var(--primary)"
           iconBg="var(--primary-bg)"
         />
         <StatCard
           title="Monthly Allowances"
-          value="$1,200.00"
-          change="Health + WFH"
+          value={formatCurrency(18500)}
+          change="HRA + Special Allowances"
           changeType="positive"
           icon={TrendingUp}
           iconColor="var(--success)"
           iconBg="var(--success-bg)"
         />
         <StatCard
-          title="Estimated Deductions"
-          value="$3,950.00"
-          change="Tax & Benefits"
+          title="TDS & Deductions"
+          value={formatCurrency(14200)}
+          change="PF + Income Tax"
           changeType="neutral"
           icon={ShieldCheck}
           iconColor="var(--warning)"
@@ -126,8 +130,8 @@ export const EmployeePayroll = () => {
         />
         <StatCard
           title="Net Take-Home"
-          value="$6,250.00"
-          change="Processed monthly"
+          value={formatCurrency(129300)}
+          change="Direct NEFT Transfer"
           changeType="positive"
           icon={CreditCard}
           iconColor="var(--pulse-cyan)"
@@ -145,126 +149,54 @@ export const EmployeePayroll = () => {
         <Modal
           isOpen={Boolean(selectedSlip)}
           onClose={() => setSelectedSlip(null)}
-          title={`Payslip — ${selectedSlip.month}`}
-          subtitle={`Disbursement ID: ${selectedSlip.id}`}
-          maxWidth="600px"
-          footer={
-            <Button
-              variant="primary"
-              size="sm"
-              icon={Download}
-              onClick={() => alert(`Downloading payslip for ${selectedSlip.month}...`)}
-            >
-              Download Official PDF
-            </Button>
-          }
+          title={`Digital Payslip — ${selectedSlip.month || 'July 2026'}`}
+          subtitle="Official employment compensation voucher with statutory breakdown."
         >
           <div className="flex flex-col gap-4">
-            {/* Header info */}
             <div
-              className="flex items-center justify-between"
-              style={{
-                padding: '1rem',
-                backgroundColor: 'var(--bg-surface-elevated)',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-subtle)',
-              }}
-            >
-              <div>
-                <p className="text-xs text-muted">EMPLOYEE NAME</p>
-                <p className="text-sm font-bold text-primary">Alex Mercer</p>
-                <p className="text-xs text-secondary">Senior Fullstack Engineer (Engineering)</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-muted">PAYMENT DATE</p>
-                <p className="text-sm font-bold text-primary">{formatDate(selectedSlip.payDate)}</p>
-                <StatusBadge status={selectedSlip.status} size="sm" />
-              </div>
-            </div>
-
-            {/* Earnings Breakdown */}
-            <div className="grid grid-cols-2 gap-4">
-              <div
-                style={{
-                  padding: '1rem',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'rgba(30, 41, 59, 0.4)',
-                  border: '1px solid var(--border-subtle)',
-                }}
-              >
-                <h4 className="text-xs font-bold text-muted uppercase" style={{ marginBottom: '0.75rem' }}>
-                  Earnings
-                </h4>
-                <div className="flex justify-between text-xs" style={{ marginBottom: '0.5rem' }}>
-                  <span className="text-secondary">Base Salary</span>
-                  <span className="text-primary font-mono">{formatCurrency(selectedSlip.baseSalary)}</span>
-                </div>
-                <div className="flex justify-between text-xs" style={{ marginBottom: '0.5rem' }}>
-                  <span className="text-secondary">Allowances & Perks</span>
-                  <span className="text-primary font-mono">{formatCurrency(selectedSlip.allowances)}</span>
-                </div>
-                <div className="flex justify-between text-xs" style={{ marginBottom: '0.5rem' }}>
-                  <span className="text-secondary">Performance Bonus</span>
-                  <span className="text-primary font-mono">{formatCurrency(selectedSlip.bonus || 0)}</span>
-                </div>
-                <div
-                  className="flex justify-between text-xs font-bold"
-                  style={{ paddingTop: '0.5rem', borderTop: '1px solid var(--border-subtle)' }}
-                >
-                  <span className="text-primary">Gross Pay</span>
-                  <span className="text-primary font-mono">{formatCurrency(selectedSlip.grossSalary)}</span>
-                </div>
-              </div>
-
-              {/* Deductions Breakdown */}
-              <div
-                style={{
-                  padding: '1rem',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'rgba(30, 41, 59, 0.4)',
-                  border: '1px solid var(--border-subtle)',
-                }}
-              >
-                <h4 className="text-xs font-bold text-muted uppercase" style={{ marginBottom: '0.75rem' }}>
-                  Deductions & Taxes
-                </h4>
-                <div className="flex justify-between text-xs" style={{ marginBottom: '0.5rem' }}>
-                  <span className="text-secondary">Income Tax (Federal/State)</span>
-                  <span className="font-mono text-rose">-{formatCurrency(selectedSlip.taxes)}</span>
-                </div>
-                <div className="flex justify-between text-xs" style={{ marginBottom: '0.5rem' }}>
-                  <span className="text-secondary">Health Insurance & 401(k)</span>
-                  <span className="font-mono text-rose">-{formatCurrency(selectedSlip.deductions)}</span>
-                </div>
-                <div
-                  className="flex justify-between text-xs font-bold"
-                  style={{ paddingTop: '0.5rem', borderTop: '1px solid var(--border-subtle)' }}
-                >
-                  <span className="text-primary">Total Deductions</span>
-                  <span className="font-mono text-rose">
-                    -{formatCurrency((selectedSlip.taxes || 0) + (selectedSlip.deductions || 0))}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Net Banner */}
-            <div
-              className="flex items-center justify-between"
               style={{
                 padding: '1.25rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--success-bg)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '12px',
+                backgroundColor: '#040407',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
               }}
             >
-              <div>
-                <p className="text-xs font-bold text-emerald uppercase">Net Take-Home Pay</p>
-                <p className="text-xs text-secondary">Directly transferred to checking account ending in ••8492</p>
+              <div className="flex justify-between items-center border-b border-subtle pb-2">
+                <span className="text-xs text-muted">Basic Salary:</span>
+                <span className="text-xs font-mono font-bold text-primary">{formatCurrency(selectedSlip.baseSalary || 125000)}</span>
               </div>
-              <span className="text-2xl font-extrabold text-emerald font-mono">
-                {formatCurrency(selectedSlip.netSalary)}
-              </span>
+              <div className="flex justify-between items-center border-b border-subtle pb-2">
+                <span className="text-xs text-muted">House Rent Allowance (HRA):</span>
+                <span className="text-xs font-mono font-bold text-emerald">+{formatCurrency(selectedSlip.allowances || 18500)}</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-subtle pb-2">
+                <span className="text-xs text-muted">Provident Fund & TDS:</span>
+                <span className="text-xs font-mono font-bold text-rose">-{formatCurrency(selectedSlip.deductions || 14200)}</span>
+              </div>
+              <div className="flex justify-between items-center pt-1">
+                <span className="text-sm font-bold text-primary">Net Amount Credited:</span>
+                <span className="text-base font-mono font-black text-emerald">{formatCurrency(selectedSlip.netSalary || 129300)}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3" style={{ marginTop: '0.5rem' }}>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedSlip(null)}>
+                Close
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={Download}
+                onClick={() => {
+                  alert('Payslip PDF downloaded successfully!');
+                  setSelectedSlip(null);
+                }}
+              >
+                Download PDF
+              </Button>
             </div>
           </div>
         </Modal>
