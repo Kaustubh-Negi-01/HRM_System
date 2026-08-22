@@ -70,6 +70,7 @@ export function App() {
               <Route path="/admin/attendance" element={<AdminAttendance />} />
               <Route path="/admin/leave-approvals" element={<LeaveApprovals />} />
               <Route path="/admin/payroll" element={<PayrollManagement />} />
+              <Route path="/admin/profile" element={<EmployeeProfile />} />
               {/* 3 Key Differentiators */}
               <Route path="/admin/workforce-pulse" element={<WorkforcePulse />} />
               <Route path="/admin/leave-impact" element={<LeaveImpact />} />

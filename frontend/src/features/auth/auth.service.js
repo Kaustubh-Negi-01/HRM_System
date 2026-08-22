@@ -71,24 +71,29 @@ export const authService = {
   },
 
   async getCurrentUser() {
-    const token = apiClient.getToken();
-    if (!token) return null;
+    const token = apiClient.getToken() || localStorage.getItem('dayflow_token');
+    const storedUser = JSON.parse(localStorage.getItem('dayflow_user') || 'null');
+    if (token && !apiClient.getToken()) {
+      apiClient.setToken(token);
+    }
+    if (!token && !storedUser) return null;
 
     try {
       const response = await apiClient.get(API_ENDPOINTS.AUTH.ME);
-      return response?.user || response;
-    } catch (error) {
-      try {
-        return JSON.parse(localStorage.getItem('dayflow_user') || 'null');
-      } catch {
-        return null;
+      if (response?.user || response?.name) {
+        const active = response?.user || response;
+        localStorage.setItem('dayflow_user', JSON.stringify(active));
+        return active;
       }
-    }
+    } catch (error) {}
+
+    return storedUser;
   },
 
   logout() {
     apiClient.setToken(null);
     localStorage.removeItem('dayflow_user');
+    localStorage.removeItem('dayflow_token');
   },
 };
 
