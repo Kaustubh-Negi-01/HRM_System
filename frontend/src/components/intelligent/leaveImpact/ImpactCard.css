@@ -1,0 +1,134 @@
+.df-impact-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.df-impact-card--risk {
+  border-left: 4px solid var(--danger);
+}
+
+.df-impact-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.df-impact-card__employee {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.df-impact-card__name {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.df-impact-card__dept {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.df-impact-card__dates {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  background-color: var(--surface-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.df-impact-card__projection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.df-impact-card__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.df-impact-card__metric-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.df-impact-card__metric-value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.df-impact-card__metric-value--projected {
+  color: var(--danger);
+}
+
+.df-impact-card__arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+}
+
+.df-impact-card__delta {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.df-impact-card__delta--neg {
+  color: var(--danger);
+}
+
+.df-impact-card__context {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.df-impact-card__context-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.df-impact-card__recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background-color: var(--warning-soft);
+  color: #92400E;
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.df-impact-card__recommendation--warning {
+  background-color: var(--danger-soft);
+  color: var(--danger);
+}
+
+.df-impact-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

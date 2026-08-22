@@ -1,0 +1,68 @@
+.df-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Sizes */
+.df-badge--sm {
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.df-badge--md {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+/* Dots */
+.df-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* Variants */
+.df-badge--primary {
+  background-color: var(--primary-soft);
+  color: var(--primary);
+}
+
+.df-badge--success {
+  background-color: var(--success-soft);
+  color: var(--success);
+}
+
+.df-badge--warning {
+  background-color: var(--warning-soft);
+  color: #B45309;
+}
+
+.df-badge--danger {
+  background-color: var(--danger-soft);
+  color: var(--danger);
+}
+
+.df-badge--info {
+  background-color: var(--info-soft);
+  color: var(--info);
+}
+
+.df-badge--neutral {
+  background-color: var(--surface-secondary);
+  color: var(--text-secondary);
+}
+
+.df-badge--secondary {
+  background-color: #F3F4F6;
+  color: #374151;
+}

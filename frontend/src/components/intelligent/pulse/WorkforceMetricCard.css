@@ -1,0 +1,100 @@
+.df-pulse-metric-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.df-pulse-metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.df-pulse-metric-card--good::before {
+  background-color: var(--success);
+}
+
+.df-pulse-metric-card--warning::before {
+  background-color: var(--warning);
+}
+
+.df-pulse-metric-card--danger::before {
+  background-color: var(--danger);
+}
+
+.df-pulse-metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.df-pulse-metric-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.df-pulse-metric-card__icon {
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.df-pulse-metric-card__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.df-pulse-metric-card__body {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.df-pulse-metric-card__value {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.df-pulse-metric-card__target {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.df-pulse-metric-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-2);
+}
+
+.df-pulse-metric-card__trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.df-pulse-metric-card__trend--up {
+  color: var(--success);
+}
+
+.df-pulse-metric-card__trend--down {
+  color: var(--danger);
+}
+
+.df-pulse-metric-card__desc {
+  color: var(--text-muted);
+}

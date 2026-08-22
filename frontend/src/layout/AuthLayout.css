@@ -1,0 +1,84 @@
+.df-auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+  padding: var(--space-4);
+}
+
+.df-auth-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: df-auth-fade 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.df-auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.df-auth-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--primary-soft);
+  color: var(--primary);
+  margin-bottom: var(--space-2);
+}
+
+.df-auth-logo-icon {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.df-auth-title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.df-auth-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.df-auth-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.df-auth-footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-4);
+}
+
+@keyframes df-auth-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
