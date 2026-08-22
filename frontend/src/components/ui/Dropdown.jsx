@@ -54,7 +54,7 @@ export const Dropdown = ({
 
       {isOpen && (
         <div className={`df-dropdown__menu df-dropdown__menu--align-${align} ${menuClassName}`}>
-          {items && items.length > 0 ? (
+          {Array.isArray(items) && items.length > 0 ? (
             items.map((item, index) => {
               if (item.divider) {
                 return <div key={`divider-${index}`} className="df-dropdown__divider" />;

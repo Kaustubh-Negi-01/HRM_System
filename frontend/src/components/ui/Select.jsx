@@ -35,7 +35,7 @@ export const Select = React.forwardRef(({
             {placeholder}
           </option>
         )}
-        {options && options.length > 0 ? (
+        {Array.isArray(options) && options.length > 0 ? (
           options.map((opt, idx) => {
             if (typeof opt === 'object' && opt !== null) {
               return (

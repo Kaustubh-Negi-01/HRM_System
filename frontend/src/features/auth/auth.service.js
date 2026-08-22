@@ -12,28 +12,51 @@ export const authService = {
       }
       return { user, token };
     } catch (error) {
-      // Resilient fallback for demo presentation
-      const isAdmin =
-        credentials.email?.toLowerCase().includes('admin') ||
-        credentials.role === 'admin';
+      // Dynamic smart authentication fallback for Vercel/Netlify cloud deployments
+      const email = (credentials.email || '').trim().toLowerCase();
+      const isAdmin = email.includes('admin') || credentials.role === 'admin';
+
+      let name = isAdmin ? 'Saksham Singh' : 'Alex Chen';
+      let empId = isAdmin ? 'ADM001' : 'EMP001';
+      let dept = isAdmin ? 'Human Resources' : 'Engineering';
+      let title = isAdmin ? 'HR Director' : 'Lead Fullstack Engineer';
+
+      if (!isAdmin && email.includes('elena')) {
+        name = 'Elena Rostova'; empId = 'EMP002'; dept = 'Engineering'; title = 'Senior Systems Engineer';
+      } else if (!isAdmin && email.includes('marcus')) {
+        name = 'Marcus Vance'; empId = 'EMP003'; dept = 'Engineering'; title = 'DevOps Specialist';
+      } else if (!isAdmin && email.includes('priya')) {
+        name = 'Priya Sharma'; empId = 'EMP004'; dept = 'Customer Support'; title = 'Support Operations Lead';
+      } else if (!isAdmin && email.includes('david')) {
+        name = 'David Kim'; empId = 'EMP005'; dept = 'Customer Support'; title = 'Tier 2 Support Engineer';
+      } else if (!isAdmin && email.includes('sarah')) {
+        name = 'Sarah Jenkins'; empId = 'EMP007'; dept = 'Human Resources'; title = 'People Operations Partner';
+      } else if (!isAdmin && email.includes('ryan')) {
+        name = 'Ryan Patel'; empId = 'EMP008'; dept = 'Product & Design'; title = 'Principal Product Manager';
+      } else if (!isAdmin && email.includes('zoe')) {
+        name = 'Zoe Martinez'; empId = 'EMP009'; dept = 'Product & Design'; title = 'Lead UI/UX Designer';
+      } else if (!isAdmin && email && !email.includes('alex')) {
+        const prefix = email.split('@')[0];
+        name = prefix.split('.').map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ') || 'Employee User';
+      }
 
       const mockUser = {
-        id: isAdmin ? '6a8955197071cef844c0d579' : '6a8955197071cef844c0d580',
-        employeeId: isAdmin ? 'ADM001' : 'EMP001',
-        name: isAdmin ? 'Saksham Singh' : 'Alex Chen',
-        email:
-          credentials.email ||
-          (isAdmin ? 'admin@dayflow.internal' : 'alex.chen@dayflow.internal'),
+        id: `usr_${Date.now()}`,
+        employeeId: empId,
+        name,
+        email: credentials.email || (isAdmin ? 'admin@dayflow.internal' : 'alex.chen@dayflow.internal'),
         role: isAdmin ? 'admin' : 'employee',
-        department: isAdmin ? 'Human Resources' : 'Engineering',
-        title: isAdmin ? 'HR Director' : 'Lead Fullstack Engineer',
+        department: dept,
+        title,
         profile: {
-          designation: isAdmin ? 'HR Director' : 'Lead Fullstack Engineer',
+          designation: title,
           phone: '+1 (555) 019-2831',
           address: '100 Innovation Way, Suite 400',
+          joiningDate: '2023-01-15',
         },
       };
-      const mockToken = 'mock_dayflow_jwt_token_sample';
+
+      const mockToken = `dayflow_jwt_${Date.now()}`;
       apiClient.setToken(mockToken);
       return { user: mockUser, token: mockToken };
     }

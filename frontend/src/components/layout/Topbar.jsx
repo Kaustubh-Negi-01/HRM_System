@@ -74,7 +74,7 @@ export const Topbar = ({
         )}
 
         <div className="df-topbar__titles">
-          {breadcrumbs && breadcrumbs.length > 0 && (
+          {Array.isArray(breadcrumbs) && breadcrumbs.length > 0 && (
             <nav className="df-topbar__breadcrumbs" aria-label="Breadcrumb">
               {breadcrumbs.map((crumb, idx) => (
                 <span key={crumb.label || idx} className="df-topbar__crumb">

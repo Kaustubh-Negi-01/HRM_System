@@ -11,7 +11,7 @@ export const Tabs = ({
 }) => {
   return (
     <div className={`df-tabs df-tabs--${variant} df-tabs--${size} ${className}`} role="tablist">
-      {tabs.map((tab) => {
+      {(Array.isArray(tabs) ? tabs : []).map((tab) => {
         const isActive = activeTab === tab.id;
         return (
           <button

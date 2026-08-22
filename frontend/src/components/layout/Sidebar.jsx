@@ -64,7 +64,7 @@ export const Sidebar = ({
 
         {/* Navigation Sections */}
         <nav className="df-sidebar__nav">
-          {sections.map((section, sIdx) => (
+          {(Array.isArray(sections) ? sections : []).map((section, sIdx) => (
             <div key={section.title || sIdx} className="df-sidebar__section">
               {section.title && !collapsed && (
                 <div className="df-sidebar__section-title">
@@ -72,7 +72,7 @@ export const Sidebar = ({
                 </div>
               )}
               <ul className="df-sidebar__list">
-                {section.items.map((item) => (
+                {(Array.isArray(section?.items) ? section.items : []).map((item) => (
                   <li key={item.to || item.label} className="df-sidebar__item">
                     <NavLink
                       to={item.to}
