@@ -35,13 +35,14 @@ export const EmployeeAttendance = () => {
     setLoading(true);
     try {
       const data = await attendanceService.getMyAttendance({ month: selectedMonth });
-      setRecords(data);
+      const safeData = Array.isArray(data) ? data : Array.isArray(data?.records) ? data.records : [];
+      setRecords(safeData);
     } finally {
       setLoading(false);
     }
   };
 
-  const stats = calculateAttendanceStats(records);
+  const stats = calculateAttendanceStats(Array.isArray(records) ? records : []);
 
   const columns = [
     {
