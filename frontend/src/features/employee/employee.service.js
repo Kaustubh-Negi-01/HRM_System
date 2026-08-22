@@ -11,7 +11,7 @@ export const employeeService = {
         {
           id: '6a8955197071cef844c0d579',
           employeeId: 'ADM001',
-          name: 'Hamza Khan',
+          name: 'Saksham Singh',
           email: 'admin@dayflow.internal',
           department: 'Human Resources',
           role: 'admin',

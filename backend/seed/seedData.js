@@ -30,7 +30,7 @@ const seedDatabase = async () => {
     const usersData = [
       {
         employeeId: 'ADM001',
-        name: 'Hamza Khan',
+        name: 'Saksham Singh',
         email: 'admin@dayflow.internal',
         passwordHash: defaultPasswordHash,
         role: ROLES.ADMIN,
@@ -291,7 +291,7 @@ const seedDatabase = async () => {
       reason: 'Family emergency and personal travel.',
       status: LEAVE_STATUS.APPROVED,
       hrComment: 'Approved as per support schedule coverage.',
-      reviewedBy: 'Hamza Khan',
+      reviewedBy: 'Saksham Singh',
       reviewedAt: new Date()
     });
 
@@ -304,7 +304,7 @@ const seedDatabase = async () => {
       reason: 'Annual vacation time off.',
       status: LEAVE_STATUS.APPROVED,
       hrComment: 'Approved. Advance notice provided.',
-      reviewedBy: 'Hamza Khan',
+      reviewedBy: 'Saksham Singh',
       reviewedAt: new Date()
     });
 

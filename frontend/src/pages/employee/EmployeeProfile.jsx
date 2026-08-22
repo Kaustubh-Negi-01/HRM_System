@@ -31,7 +31,7 @@ export const EmployeeProfile = () => {
     department: user?.department || 'Engineering',
     role: user?.profile?.designation || user?.title || 'Lead Fullstack Engineer',
     joinDate: 'March 1, 2023',
-    manager: 'Hamza Khan (HR Director)',
+    manager: 'Saksham Singh (HR Director)',
     emergencyContactName: 'Laura Chen',
     emergencyContactPhone: '+1 (555) 890-1234',
     emergencyRelation: 'Spouse',

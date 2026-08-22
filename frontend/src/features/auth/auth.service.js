@@ -20,7 +20,7 @@ export const authService = {
       const mockUser = {
         id: isAdmin ? '6a8955197071cef844c0d579' : '6a8955197071cef844c0d580',
         employeeId: isAdmin ? 'ADM001' : 'EMP001',
-        name: isAdmin ? 'Hamza Khan' : 'Alex Chen',
+        name: isAdmin ? 'Saksham Singh' : 'Alex Chen',
         email:
           credentials.email ||
           (isAdmin ? 'admin@dayflow.internal' : 'alex.chen@dayflow.internal'),

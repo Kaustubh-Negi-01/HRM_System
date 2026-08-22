@@ -37,7 +37,7 @@ const DEFAULT_ACTIVITIES = [
   },
   {
     id: 'act_4',
-    name: 'Hamza Khan',
+    name: 'Saksham Singh',
     action: 'disbursed',
     target: 'July Payroll Batch',
     description: '• 52 slips verified',

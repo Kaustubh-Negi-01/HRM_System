@@ -1,6 +1,6 @@
 {
   "users": [
-    { "employeeId": "ADM001", "name": "Hamza Khan", "email": "admin@dayflow.internal", "role": "ADMIN", "department": "Human Resources" },
+    { "employeeId": "ADM001", "name": "Saksham Singh", "email": "admin@dayflow.internal", "role": "ADMIN", "department": "Human Resources" },
     { "employeeId": "EMP001", "name": "Alex Chen", "email": "alex.chen@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },
     { "employeeId": "EMP002", "name": "Elena Rostova", "email": "elena.rostova@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },
     { "employeeId": "EMP003", "name": "Marcus Vance", "email": "marcus.vance@dayflow.internal", "role": "EMPLOYEE", "department": "Engineering" },

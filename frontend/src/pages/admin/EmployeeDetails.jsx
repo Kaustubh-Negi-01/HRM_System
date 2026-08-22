@@ -36,7 +36,7 @@ export const EmployeeDetails = () => {
     joinDate: '2023-03-01',
     status: 'active',
     salary: 8500,
-    manager: 'Hamza Khan',
+    manager: 'Saksham Singh',
     healthScore: 88,
     burnoutRisk: 'Low',
     overtimeHours: 4.5,
