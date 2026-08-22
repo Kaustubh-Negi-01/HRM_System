@@ -12,6 +12,16 @@ const ALERT_ICONS = {
   pulse: <Zap size={20} style={{ color: 'var(--pulse-cyan)' }} />,
 };
 
+const renderIconProp = (icon, size = 20) => {
+  if (!icon) return null;
+  if (React.isValidElement(icon)) return icon;
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
+    const IconComp = icon;
+    return <IconComp size={size} />;
+  }
+  return null;
+};
+
 export const AlertCard = ({
   variant = 'warning',
   type,
@@ -41,7 +51,7 @@ export const AlertCard = ({
   return (
     <div className={`df-alert-card df-alert-card--${alertVariant} ${className}`}>
       <div className="df-alert-card__icon">
-        {icon || ALERT_ICONS[alertVariant] || ALERT_ICONS.warning}
+        {renderIconProp(icon) || ALERT_ICONS[alertVariant] || ALERT_ICONS.warning}
       </div>
 
       <div className="df-alert-card__content">

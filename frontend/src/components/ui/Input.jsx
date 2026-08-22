@@ -2,14 +2,14 @@ import React, { useId } from 'react';
 import Field from './Field';
 import './Input.css';
 
-const renderIconProp = (icon) => {
+const renderIconProp = (icon, size = 16) => {
   if (!icon) return null;
   if (React.isValidElement(icon)) return icon;
-  if (typeof icon === 'function') {
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
     const IconComp = icon;
-    return <IconComp size={16} />;
+    return <IconComp size={size} />;
   }
-  return icon;
+  return null;
 };
 
 export const Input = React.forwardRef(({

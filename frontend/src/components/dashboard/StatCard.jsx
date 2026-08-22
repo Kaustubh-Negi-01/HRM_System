@@ -50,8 +50,11 @@ export const StatCard = ({
   const renderIcon = () => {
     if (!IconProp) return null;
     if (React.isValidElement(IconProp)) return IconProp;
-    const IconComponent = IconProp;
-    return <IconComponent size={20} />;
+    if (typeof IconProp === 'function' || (typeof IconProp === 'object' && IconProp !== null && (IconProp.$$typeof || IconProp.render))) {
+      const IconComponent = IconProp;
+      return <IconComponent size={20} />;
+    }
+    return null;
   };
 
   return (

@@ -5,6 +5,16 @@ import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
 import './Sidebar.css';
 
+const renderIconProp = (icon, size = 18) => {
+  if (!icon) return null;
+  if (React.isValidElement(icon)) return icon;
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
+    const IconComp = icon;
+    return <IconComp size={size} />;
+  }
+  return null;
+};
+
 export const Sidebar = ({
   sections = [],
   user = { name: 'Alex Morgan', role: 'HR Administrator', email: 'alex.morgan@dayflow.io' },
@@ -75,7 +85,7 @@ export const Sidebar = ({
                       }}
                       title={collapsed ? item.label : undefined}
                     >
-                      {item.icon && <span className="df-sidebar__link-icon">{item.icon}</span>}
+                      {item.icon && <span className="df-sidebar__link-icon">{renderIconProp(item.icon)}</span>}
                       {!collapsed && <span className="df-sidebar__link-label">{item.label}</span>}
                       {!collapsed && item.badge && (
                         <span className="df-sidebar__link-badge">

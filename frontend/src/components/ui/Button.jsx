@@ -1,14 +1,14 @@
 import React from 'react';
 import './Button.css';
 
-const renderIconProp = (icon) => {
+const renderIconProp = (icon, size = 16) => {
   if (!icon) return null;
   if (React.isValidElement(icon)) return icon;
-  if (typeof icon === 'function') {
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
     const IconComp = icon;
-    return <IconComp size={16} />;
+    return <IconComp size={size} />;
   }
-  return icon;
+  return null;
 };
 
 export const Button = React.forwardRef(({
@@ -44,9 +44,9 @@ export const Button = React.forwardRef(({
       {...props}
     >
       {isSpinning && <span className="df-button__spinner" aria-hidden="true" />}
-      {!isSpinning && leftIcon && <span className="df-button__icon">{renderIconProp(leftIcon)}</span>}
+      {!isSpinning && leftIcon && <span className="df-button__icon">{renderIconProp(leftIcon, size === 'sm' ? 14 : size === 'lg' ? 18 : 16)}</span>}
       {children && <span className="df-button__content">{children}</span>}
-      {!isSpinning && rightIcon && <span className="df-button__icon-right">{renderIconProp(rightIcon)}</span>}
+      {!isSpinning && rightIcon && <span className="df-button__icon-right">{renderIconProp(rightIcon, size === 'sm' ? 14 : size === 'lg' ? 18 : 16)}</span>}
     </button>
   );
 });

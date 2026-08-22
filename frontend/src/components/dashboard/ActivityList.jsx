@@ -47,6 +47,16 @@ const DEFAULT_ACTIVITIES = [
   },
 ];
 
+const renderIconProp = (icon, size = 16) => {
+  if (!icon) return null;
+  if (React.isValidElement(icon)) return icon;
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
+    const IconComp = icon;
+    return <IconComp size={size} />;
+  }
+  return null;
+};
+
 export const ActivityItem = ({
   avatar,
   name,
@@ -63,7 +73,7 @@ export const ActivityItem = ({
     <div className={`df-activity-item ${className}`}>
       <div className="df-activity-item__avatar">
         {icon ? (
-          <div className="df-activity-item__icon-wrap">{icon}</div>
+          <div className="df-activity-item__icon-wrap">{renderIconProp(icon)}</div>
         ) : (
           <Avatar src={avatar} name={name} size="sm" />
         )}

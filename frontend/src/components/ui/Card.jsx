@@ -1,14 +1,14 @@
 import React from 'react';
 import './Card.css';
 
-const renderIconProp = (icon) => {
+const renderIconProp = (icon, size = 18) => {
   if (!icon) return null;
   if (React.isValidElement(icon)) return icon;
-  if (typeof icon === 'function') {
+  if (typeof icon === 'function' || (typeof icon === 'object' && icon !== null && (icon.$$typeof || icon.render))) {
     const IconComp = icon;
-    return <IconComp size={18} />;
+    return <IconComp size={size} />;
   }
-  return icon;
+  return null;
 };
 
 export const Card = ({
