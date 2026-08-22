@@ -1,5 +1,6 @@
 import apiClient from '../../api/apiClient';
 import { API_ENDPOINTS } from '../../api/endpoints';
+import supabase from '../../api/supabaseClient';
 
 const STORAGE_KEY_PENDING = 'dayflow_pending_leaves';
 const STORAGE_KEY_MY = 'dayflow_my_leaves';
@@ -110,10 +111,6 @@ function saveStoredLeaves(key, data) {
 
 export const leaveService = {
   async applyLeave(leaveData) {
-    try {
-      await apiClient.post(API_ENDPOINTS.LEAVE.APPLY, leaveData);
-    } catch (err) {}
-
     const currentUser = JSON.parse(localStorage.getItem('dayflow_user') || '{}');
     const newId = `req_${Date.now()}`;
     const newRecord = {
@@ -134,27 +131,71 @@ export const leaveService = {
       overlapCount: 1,
     };
 
-    // Synchronize to both stores
+    // 1. Direct Supabase Cloud insert
+    try {
+      if (supabase && supabase.from) {
+        await supabase.from('leave_requests').insert([
+          {
+            employee_id: newRecord.employeeId,
+            leave_type: newRecord.leaveType,
+            start_date: newRecord.startDate,
+            end_date: newRecord.endDate,
+            days: newRecord.days,
+            reason: newRecord.reason,
+            status: 'PENDING',
+            impact_score: newRecord.impactScore,
+            impact_risk: newRecord.impactRisk,
+          },
+        ]);
+      }
+    } catch (sbErr) {
+      console.warn('[LeaveService] Supabase sync fallback:', sbErr.message);
+    }
+
+    // 2. API / LocalStorage sync
+    try {
+      await apiClient.post(API_ENDPOINTS.LEAVE.APPLY, leaveData);
+    } catch (err) {}
+
     const myLeaves = getStoredLeaves(STORAGE_KEY_MY, INITIAL_MY_LEAVES);
-    const updatedMy = [newRecord, ...myLeaves];
-    saveStoredLeaves(STORAGE_KEY_MY, updatedMy);
+    saveStoredLeaves(STORAGE_KEY_MY, [newRecord, ...myLeaves]);
 
     const pendingLeaves = getStoredLeaves(STORAGE_KEY_PENDING, INITIAL_PENDING_APPROVALS);
-    const updatedPending = [newRecord, ...pendingLeaves];
-    saveStoredLeaves(STORAGE_KEY_PENDING, updatedPending);
+    saveStoredLeaves(STORAGE_KEY_PENDING, [newRecord, ...pendingLeaves]);
 
-    // Trigger local storage event for cross-tab sync
     window.dispatchEvent(new Event('dayflow_leave_updated'));
-
     return newRecord;
   },
 
   async getMyRequests() {
     try {
+      if (supabase && supabase.from) {
+        const { data, error } = await supabase
+          .from('leave_requests')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map((d) => ({
+            id: d.id,
+            leaveType: (d.leave_type || 'annual').toLowerCase(),
+            startDate: d.start_date,
+            endDate: d.end_date,
+            days: d.days || 1,
+            reason: d.reason || '—',
+            status: (d.status || 'pending').toLowerCase(),
+            appliedAt: d.created_at?.split('T')[0] || '2026-08-22',
+          }));
+        }
+      }
+    } catch (sbErr) {}
+
+    try {
       const res = await apiClient.get(API_ENDPOINTS.LEAVE.MY_REQUESTS);
       if (Array.isArray(res) && res.length > 0) return res;
       if (Array.isArray(res?.data) && res.data.length > 0) return res.data;
     } catch (err) {}
+
     return getStoredLeaves(STORAGE_KEY_MY, INITIAL_MY_LEAVES);
   },
 
@@ -173,10 +214,41 @@ export const leaveService = {
 
   async getPendingApprovals() {
     try {
+      if (supabase && supabase.from) {
+        const { data, error } = await supabase
+          .from('leave_requests')
+          .select('*')
+          .eq('status', 'PENDING')
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map((d) => ({
+            id: d.id,
+            employeeId: d.employee_id || 'EMP001',
+            employeeName: d.employee_id === 'EMP004' ? 'Priya Sharma' : d.employee_id === 'EMP003' ? 'Marcus Vance' : 'Alex Chen',
+            department: d.employee_id === 'EMP004' ? 'Customer Support' : 'Engineering',
+            role: d.employee_id === 'EMP004' ? 'Support Operations Lead' : 'Engineer',
+            leaveType: (d.leave_type || 'annual').toLowerCase(),
+            startDate: d.start_date,
+            endDate: d.end_date,
+            days: d.days || 1,
+            reason: d.reason || '—',
+            status: 'pending',
+            appliedAt: d.created_at?.split('T')[0] || '2026-08-22',
+            impactScore: d.impact_score || 65,
+            impactRisk: (d.impact_risk || 'moderate').toLowerCase(),
+            overlapCount: 1,
+          }));
+        }
+      }
+    } catch (sbErr) {}
+
+    try {
       const res = await apiClient.get(API_ENDPOINTS.LEAVE.PENDING_APPROVALS);
       if (Array.isArray(res) && res.length > 0) return res;
       if (Array.isArray(res?.data) && res.data.length > 0) return res.data;
     } catch (err) {}
+
     return getStoredLeaves(STORAGE_KEY_PENDING, INITIAL_PENDING_APPROVALS);
   },
 
@@ -185,19 +257,28 @@ export const leaveService = {
   },
 
   async updateLeaveStatus(leaveId, status, comment = '') {
+    // 1. Supabase Cloud update
     try {
-      await apiClient.put(API_ENDPOINTS.LEAVE.UPDATE_STATUS(leaveId), { status, comment });
-    } catch (err) {}
+      if (supabase && supabase.from) {
+        await supabase
+          .from('leave_requests')
+          .update({ status: status.toUpperCase(), reviewed_by: 'Saksham Singh', reviewed_at: new Date().toISOString() })
+          .eq('id', leaveId);
+      }
+    } catch (sbErr) {}
 
-    // Update pending approvals store
+    // 2. Local store updates
     const pendingLeaves = getStoredLeaves(STORAGE_KEY_PENDING, INITIAL_PENDING_APPROVALS);
-    const updatedPending = pendingLeaves.filter((r) => r.id !== leaveId);
-    saveStoredLeaves(STORAGE_KEY_PENDING, updatedPending);
+    saveStoredLeaves(
+      STORAGE_KEY_PENDING,
+      pendingLeaves.filter((r) => r.id !== leaveId)
+    );
 
-    // Update my leaves store if applicable
     const myLeaves = getStoredLeaves(STORAGE_KEY_MY, INITIAL_MY_LEAVES);
-    const updatedMy = myLeaves.map((r) => (r.id === leaveId ? { ...r, status } : r));
-    saveStoredLeaves(STORAGE_KEY_MY, updatedMy);
+    saveStoredLeaves(
+      STORAGE_KEY_MY,
+      myLeaves.map((r) => (r.id === leaveId ? { ...r, status } : r))
+    );
 
     window.dispatchEvent(new Event('dayflow_leave_updated'));
     return { success: true, id: leaveId, status };
