@@ -1,3 +1,3 @@
-export { default as Sidebar, Sidebar } from '../layout/Sidebar';
-export { default as Topbar, Topbar } from '../layout/Topbar';
-export { default as PageHeader, PageHeader, PageContainer } from '../layout/PageContainer';
+export { default as Sidebar } from '../layout/Sidebar';
+export { default as Topbar } from '../layout/Topbar';
+export { default as PageHeader, PageContainer } from '../layout/PageContainer';
