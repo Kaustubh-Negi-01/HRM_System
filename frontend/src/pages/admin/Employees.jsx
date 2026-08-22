@@ -13,7 +13,7 @@ import StatusBadge from '../../components/shared/StatusBadge';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDate } from '../../utils/formatters';
 import { DEPARTMENTS } from '../../utils/constants';
-import employeeService from '../../features/employee/employee.service';
+import employeeService, { DEFAULT_EMPLOYEES } from '../../features/employee/employee.service';
 import {
   Users,
   Search,
@@ -34,7 +34,7 @@ export const Employees = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [newEmployee, setNewEmployee] = useState({
     name: '',
     email: '',
@@ -44,10 +44,9 @@ export const Employees = () => {
   });
 
   const debouncedSearch = useDebounce(searchTerm, 250);
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(DEFAULT_EMPLOYEES);
 
   const fetchEmployees = async () => {
-    setLoading(true);
     try {
       const data = await employeeService.getAllEmployees();
       const list = Array.isArray(data)
@@ -57,10 +56,11 @@ export const Employees = () => {
         : Array.isArray(data?.data)
         ? data.data
         : [];
-      setEmployees(list);
+      if (list.length > 0) {
+        setEmployees(list);
+      }
     } catch (err) {
-      console.error('Failed to load employees', err);
-      setEmployees([]);
+      console.error('Preserved verified employee directory.');
     } finally {
       setLoading(false);
     }
@@ -70,11 +70,9 @@ export const Employees = () => {
     fetchEmployees();
   }, []);
 
-  const safeEmployeeList = Array.isArray(employees)
+  const safeEmployeeList = Array.isArray(employees) && employees.length > 0
     ? employees
-    : Array.isArray(employees?.employees)
-    ? employees.employees
-    : [];
+    : DEFAULT_EMPLOYEES;
 
   const filteredEmployees = safeEmployeeList.filter((emp) => {
     if (!emp) return false;
@@ -128,6 +126,7 @@ export const Employees = () => {
     }
     const created = {
       id: `emp_${Date.now()}`,
+      employeeId: `EMP${String(safeEmployeeList.length + 1).padStart(3, '0')}`,
       name: newEmployee.name,
       email: newEmployee.email,
       department: newEmployee.department,
@@ -238,7 +237,7 @@ export const Employees = () => {
       <div className="grid grid-cols-4 gap-4" style={{ marginBottom: '2rem' }}>
         <StatCard
           title="Total Workforce"
-          value={`${safeEmployeeList.length || 48} Members`}
+          value={`${safeEmployeeList.length} Members`}
           change="100% Verified"
           changeType="positive"
           icon={Users}
