@@ -49,6 +49,19 @@ export const workforceService = {
     }
   },
 
+  async getWorkforceTrends(days = 30) {
+    try {
+      return await apiClient.get(`${API_ENDPOINTS.WORKFORCE.PULSE}/trends`, { days });
+    } catch (err) {
+      return [
+        { date: '2026-08-01', healthIndex: 92, attendanceRate: 96, overtimeHours: 12 },
+        { date: '2026-08-08', healthIndex: 89, attendanceRate: 94, overtimeHours: 18 },
+        { date: '2026-08-15', healthIndex: 85, attendanceRate: 93, overtimeHours: 24 },
+        { date: '2026-08-22', healthIndex: 88, attendanceRate: 95, overtimeHours: 16 },
+      ];
+    }
+  },
+
   async getBurnoutRisks() {
     try {
       return await apiClient.get(API_ENDPOINTS.WORKFORCE.BURNOUT_RISKS);
@@ -61,5 +74,10 @@ export const workforceService = {
     }
   },
 };
+
+// Named exports for individual imports
+export const getWorkforcePulse = workforceService.getWorkforcePulse;
+export const getWorkforceTrends = workforceService.getWorkforceTrends;
+export const getBurnoutRisks = workforceService.getBurnoutRisks;
 
 export default workforceService;

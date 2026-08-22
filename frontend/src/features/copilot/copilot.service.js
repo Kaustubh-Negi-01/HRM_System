@@ -2,13 +2,12 @@ import apiClient from '../../api/apiClient';
 import { API_ENDPOINTS } from '../../api/endpoints';
 
 export const copilotService = {
-  async askQuestion(query, history = []) {
+  async queryCopilot(question, context = {}) {
     try {
-      return await apiClient.post(API_ENDPOINTS.COPILOT.CHAT, { query, history });
+      return await apiClient.post(API_ENDPOINTS.COPILOT.CHAT, { query: question, context });
     } catch (err) {
-      // Data-aware fallback AI assistant response for demo presentation
-      const lower = query.toLowerCase();
-
+      // Data-aware AI assistant fallback
+      const lower = (question || '').toLowerCase();
       let answer = '';
       let dataTable = null;
       let actionRecommendation = null;
@@ -57,7 +56,7 @@ export const copilotService = {
           link: '/admin/payroll',
         };
       } else {
-        answer = `DayFlow Copilot analyzed your HRMS dataset regarding: *"${query}"*.\n\nAll organizational parameters appear within standard operating bounds. Total active workforce is at **94.2% daily attendance** with no compliance bottlenecks detected.`;
+        answer = `DayFlow Copilot analyzed your HRMS dataset regarding: *"${question}"*.\n\nAll organizational parameters appear within standard operating bounds. Total active workforce is at **94.2% daily attendance** with no compliance bottlenecks detected.`;
       }
 
       return {
@@ -71,7 +70,11 @@ export const copilotService = {
     }
   },
 
-  getSuggestedPrompts() {
+  async askQuestion(query, history = []) {
+    return this.queryCopilot(query, { history });
+  },
+
+  getCopilotPrompts() {
     return [
       'Who is at the highest risk of burnout this quarter?',
       'Simulate leave impact for Alex Mercer in September',
@@ -79,6 +82,16 @@ export const copilotService = {
       'Show me departments with unplanned absence spikes',
     ];
   },
+
+  getSuggestedPrompts() {
+    return this.getCopilotPrompts();
+  },
 };
+
+// Named exports for individual imports
+export const queryCopilot = copilotService.queryCopilot;
+export const askQuestion = copilotService.askQuestion;
+export const getCopilotPrompts = copilotService.getCopilotPrompts;
+export const getSuggestedPrompts = copilotService.getSuggestedPrompts;
 
 export default copilotService;

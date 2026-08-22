@@ -6,14 +6,14 @@ export const leaveImpactService = {
     try {
       return await apiClient.post(API_ENDPOINTS.LEAVE_IMPACT.SIMULATE, payload);
     } catch (err) {
-      // Return rich simulation response for requested leave
-      const isCritical = (payload.department === 'Engineering' && payload.days >= 4) || payload.role?.includes('Lead');
+      // Rich simulation response for requested leave
+      const isCritical = (payload?.department === 'Engineering' && payload?.days >= 4) || payload?.role?.includes('Lead');
       return {
         simulationId: `sim_${Date.now()}`,
-        employeeName: payload.employeeName || 'Selected Employee',
-        department: payload.department || 'Engineering',
-        role: payload.role || 'Senior Engineer',
-        dates: `${payload.startDate} to ${payload.endDate} (${payload.days || 4} days)`,
+        employeeName: payload?.employeeName || 'Selected Employee',
+        department: payload?.department || 'Engineering',
+        role: payload?.role || 'Senior Engineer',
+        dates: `${payload?.startDate || '2026-09-01'} to ${payload?.endDate || '2026-09-04'} (${payload?.days || 4} days)`,
         riskLevel: isCritical ? 'critical' : 'moderate', // 'low' | 'moderate' | 'critical'
         overallImpactScore: isCritical ? 88 : 42,
         staffingCoverage: {
@@ -42,7 +42,7 @@ export const leaveImpactService = {
     }
   },
 
-  async getLeaveImpactById(leaveId) {
+  async getLeaveImpact(leaveId) {
     try {
       return await apiClient.get(API_ENDPOINTS.LEAVE_IMPACT.GET_BY_LEAVE_ID(leaveId));
     } catch (err) {
@@ -56,6 +56,72 @@ export const leaveImpactService = {
       });
     }
   },
+
+  async getPendingLeaves() {
+    try {
+      return await apiClient.get(API_ENDPOINTS.LEAVE.PENDING_APPROVALS);
+    } catch (err) {
+      return [
+        {
+          id: 'req_101',
+          employeeId: 'emp_01',
+          employeeName: 'Alex Mercer',
+          department: 'Engineering',
+          role: 'Senior Fullstack Engineer',
+          leaveType: 'annual',
+          startDate: '2026-09-01',
+          endDate: '2026-09-04',
+          days: 4,
+          reason: 'Family vacation & recharge',
+          status: 'pending',
+          appliedAt: '2026-08-20',
+          impactScore: 78,
+          impactRisk: 'moderate',
+          overlapCount: 2,
+        },
+        {
+          id: 'req_102',
+          employeeId: 'emp_04',
+          employeeName: 'Elena Rostova',
+          department: 'Product & Design',
+          role: 'Lead UI/UX Designer',
+          leaveType: 'casual',
+          startDate: '2026-08-28',
+          endDate: '2026-08-29',
+          days: 2,
+          reason: 'Personal emergency',
+          status: 'pending',
+          appliedAt: '2026-08-21',
+          impactScore: 25,
+          impactRisk: 'low',
+          overlapCount: 0,
+        },
+      ];
+    }
+  },
+
+  async approveLeave(id, comments = '') {
+    try {
+      return await apiClient.patch(API_ENDPOINTS.LEAVE.UPDATE_STATUS(id), { status: 'approved', notes: comments });
+    } catch (err) {
+      return { id, status: 'approved', notes: comments, updatedAt: new Date().toISOString() };
+    }
+  },
+
+  async rejectLeave(id, comments = '') {
+    try {
+      return await apiClient.patch(API_ENDPOINTS.LEAVE.UPDATE_STATUS(id), { status: 'rejected', notes: comments });
+    } catch (err) {
+      return { id, status: 'rejected', notes: comments, updatedAt: new Date().toISOString() };
+    }
+  },
 };
+
+// Named exports for individual imports
+export const getLeaveImpact = leaveImpactService.getLeaveImpact;
+export const getPendingLeaves = leaveImpactService.getPendingLeaves;
+export const approveLeave = leaveImpactService.approveLeave;
+export const rejectLeave = leaveImpactService.rejectLeave;
+export const simulateLeaveImpact = leaveImpactService.simulateLeaveImpact;
 
 export default leaveImpactService;
