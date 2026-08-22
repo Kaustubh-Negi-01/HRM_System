@@ -168,7 +168,10 @@ humanresourcemanagement/
 
 ---
 
-## 📄 License & Ownership
+## 👥 Contributors
 
-Built for the **DayFlow Intelligent Workforce OS Hackathon**.  
-Lead Development by **Saksham Singh** & Team.
+Made by:
+* **Hamza**
+* **Kaustubh**
+* **Santosh**
+* **Saksham**
