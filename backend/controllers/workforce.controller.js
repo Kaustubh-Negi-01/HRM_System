@@ -30,8 +30,28 @@ const getAttendanceTrend = async (req, res, next) => {
   }
 };
 
+const getBurnoutRisks = async (req, res, next) => {
+  try {
+    const data = await workforceService.getBurnoutRisks();
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getDepartmentStats = async (req, res, next) => {
+  try {
+    const data = await workforceService.getDepartmentStats();
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getWorkforcePulse,
   getWorkforceAlerts,
-  getAttendanceTrend
+  getAttendanceTrend,
+  getBurnoutRisks,
+  getDepartmentStats
 };

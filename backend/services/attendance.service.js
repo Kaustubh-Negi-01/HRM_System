@@ -1,7 +1,9 @@
-const Attendance = require('../models/Attendance');
+﻿const Attendance = require('../models/Attendance');
 const User = require('../models/User');
 const { ATTENDANCE_STATUS } = require('../utils/constants');
 const { formatDate } = require('../utils/calculations');
+const { mapRole } = require('../utils/dialect');
+const { mapAttendanceStatus } = require('../utils/dialect');
 
 const checkIn = async (employeeId, dateStr = null) => {
   const date = dateStr || formatDate(new Date());
@@ -100,6 +102,24 @@ const getMeAttendance = async (employeeId, { limit = 30, startDate, endDate } = 
   };
 };
 
+/**
+ * Own attendance status for today â€” shaped for the employee dashboard widget.
+ */
+const getMeToday = async (employeeId, dateStr = null) => {
+  const date = dateStr || formatDate(new Date());
+  const record = await Attendance.findOne({ employeeId, date });
+
+  return {
+    date,
+    isCheckedIn: Boolean(record && record.checkIn),
+    isCheckedOut: Boolean(record && record.checkOut),
+    checkInTime: record && record.checkIn ? record.checkIn : null,
+    checkOutTime: record && record.checkOut ? record.checkOut : null,
+    hoursWorked: record ? record.workHours || 0 : 0,
+    status: mapAttendanceStatus(record ? record.status : ATTENDANCE_STATUS.ABSENT)
+  };
+};
+
 const getTeamAttendance = async (department, dateStr = null) => {
   const date = dateStr || formatDate(new Date());
   const users = await User.find({ department });
@@ -116,17 +136,22 @@ const getTeamAttendance = async (department, dateStr = null) => {
     const att = recordMap.get(u.employeeId);
     return {
       employeeId: u.employeeId,
+      employeeName: u.name,
       name: u.name,
       department: u.department,
       date,
       checkIn: att ? att.checkIn : null,
       checkOut: att ? att.checkOut : null,
-      status: att ? att.status : ATTENDANCE_STATUS.ABSENT,
-      workHours: att ? att.workHours : 0
+      status: mapAttendanceStatus(att ? att.status : ATTENDANCE_STATUS.ABSENT),
+      workHours: att ? att.workHours : 0,
+      hoursWorked: att ? att.workHours || 0 : 0
     };
   });
 };
 
+/**
+ * Organization-wide attendance for a date (admin view).
+ */
 const getTodayAttendance = async (dateStr = null) => {
   const date = dateStr || formatDate(new Date());
   const users = await User.find();
@@ -138,22 +163,78 @@ const getTodayAttendance = async (dateStr = null) => {
     const att = recordMap.get(u.employeeId);
     return {
       employeeId: u.employeeId,
+      employeeName: u.name,
       name: u.name,
       department: u.department,
-      role: u.role,
+      role: mapRole(u.role),
       date,
       checkIn: att ? att.checkIn : null,
       checkOut: att ? att.checkOut : null,
-      status: att ? att.status : ATTENDANCE_STATUS.ABSENT,
-      workHours: att ? att.workHours : 0
+      status: mapAttendanceStatus(att ? att.status : ATTENDANCE_STATUS.ABSENT),
+      workHours: att ? att.workHours : 0,
+      hoursWorked: att ? att.workHours || 0 : 0
     };
   });
+};
+
+/**
+ * Admin manual attendance marking.
+ */
+const markManualAttendance = async ({ employeeId, dateStr = null, status, checkIn = null, checkOut = null }) => {
+  const date = dateStr || formatDate(new Date());
+  const upperEmployeeId = String(employeeId || '').toUpperCase();
+
+  const user = await User.findOne({ employeeId: upperEmployeeId });
+  if (!user) {
+    const err = new Error(`Employee ${upperEmployeeId} not found.`);
+    err.code = 'NOT_FOUND';
+    err.status = 404;
+    throw err;
+  }
+
+  // Map frontend dialect status back to canonical enum
+  let canonicalStatus = ATTENDANCE_STATUS.PRESENT;
+  switch (String(status || '').toLowerCase()) {
+    case 'absent':
+      canonicalStatus = ATTENDANCE_STATUS.ABSENT;
+      break;
+    case 'half_day':
+      canonicalStatus = ATTENDANCE_STATUS.HALF_DAY;
+      break;
+    case 'on_leave':
+    case 'leave':
+      canonicalStatus = ATTENDANCE_STATUS.LEAVE;
+      break;
+    case 'present':
+    default:
+      canonicalStatus = ATTENDANCE_STATUS.PRESENT;
+  }
+
+  const record = await Attendance.findOneAndUpdate(
+    { employeeId: upperEmployeeId, date },
+    {
+      employeeId: upperEmployeeId,
+      date,
+      status: canonicalStatus,
+      checkIn: checkIn ? new Date(checkIn) : null,
+      checkOut: checkOut ? new Date(checkOut) : null,
+      workHours:
+        checkIn && checkOut
+          ? Number(Math.max(0, (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60)).toFixed(2))
+          : 0
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
+
+  return record;
 };
 
 module.exports = {
   checkIn,
   checkOut,
   getMeAttendance,
+  getMeToday,
   getTeamAttendance,
-  getTodayAttendance
+  getTodayAttendance,
+  markManualAttendance
 };

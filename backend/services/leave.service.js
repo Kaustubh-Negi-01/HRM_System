@@ -1,10 +1,13 @@
 const LeaveRequest = require('../models/LeaveRequest');
 const Attendance = require('../models/Attendance');
 const User = require('../models/User');
-const { LEAVE_STATUS, ATTENDANCE_STATUS } = require('../utils/constants');
-const { formatDate, dateRangesOverlap } = require('../utils/calculations');
+const { LEAVE_STATUS, ATTENDANCE_STATUS, LEAVE_BALANCE_DEFAULTS } = require('../utils/constants');
+const { formatDate, dateRangesOverlap, getDaysBetween } = require('../utils/calculations');
+const { normalizeLeaveType, mapLeaveType } = require('../utils/dialect');
 
 const createLeaveRequest = async ({ employeeId, leaveType, startDate, endDate, reason }) => {
+  const canonicalType = normalizeLeaveType(leaveType);
+
   if (new Date(startDate) > new Date(endDate)) {
     const err = new Error('Start date must be on or before end date.');
     err.code = 'INVALID_DATE_RANGE';
@@ -31,7 +34,7 @@ const createLeaveRequest = async ({ employeeId, leaveType, startDate, endDate, r
 
   const leave = await LeaveRequest.create({
     employeeId,
-    leaveType,
+    leaveType: canonicalType,
     startDate,
     endDate,
     reason,
@@ -43,6 +46,51 @@ const createLeaveRequest = async ({ employeeId, leaveType, startDate, endDate, r
 
 const getMeLeaves = async (employeeId) => {
   return LeaveRequest.find({ employeeId }).sort({ createdAt: -1 });
+};
+
+/**
+ * Leave balance for the logged-in employee, in frontend dialect:
+ * { annual: {total, used, remaining}, sick: {...}, ... , unpaid: {used} }
+ */
+const getLeaveBalance = async (employeeId) => {
+  const yearStart = `${new Date().getFullYear()}-01-01`;
+  const yearEnd = `${new Date().getFullYear()}-12-31`;
+
+  const approvedLeaves = await LeaveRequest.find({
+    employeeId,
+    status: LEAVE_STATUS.APPROVED,
+    startDate: { $lte: yearEnd },
+    endDate: { $gte: yearStart }
+  });
+
+  // used days per canonical type
+  const usedByDialect = {};
+  approvedLeaves.forEach((l) => {
+    const dialectType = mapLeaveType(l.leaveType);
+    usedByDialect[dialectType] =
+      (usedByDialect[dialectType] || 0) + getDaysBetween(l.startDate, l.endDate);
+  });
+
+  const balance = {};
+  Object.entries(LEAVE_BALANCE_DEFAULTS).forEach(([dialectType, def]) => {
+    const used = usedByDialect[dialectType] || 0;
+    if (def.total === null) {
+      balance[dialectType] = { total: null, used, remaining: null };
+    } else {
+      balance[dialectType] = {
+        total: def.total,
+        used,
+        remaining: Math.max(0, def.total - used)
+      };
+    }
+  });
+
+  return {
+    year: new Date().getFullYear(),
+    balances: balance,
+    // Flat shape too, so either consumer style works
+    ...balance
+  };
 };
 
 const getAllLeaves = async (filters = {}) => {
@@ -144,11 +192,62 @@ const rejectLeave = async (id, adminUser, comment = '') => {
   return getLeaveById(leave._id.toString());
 };
 
+/**
+ * Pending approvals enriched with LIVE Smart Leave Impact metrics so the HR
+ * queue shows risk scores computed from real staffing data.
+ */
+const getPendingLeavesWithImpact = async () => {
+  const pendingLeaves = await getAllLeaves({ status: LEAVE_STATUS.PENDING });
+
+  // Lazy require to avoid any future circular dependency issues
+  const { calculateLeaveImpact } = require('./leaveImpact.service');
+
+  return Promise.all(
+    pendingLeaves.map(async (l) => {
+      try {
+        const impact = await calculateLeaveImpact(l.id);
+        // Score anchored to the risk band so score and label always agree.
+        // calculateLeaveImpact returns dialect-mapped levels (critical/moderate/low),
+        // so normalize to canonical bands before the lookups below.
+        const canonBand =
+          {
+            CRITICAL: 'HIGH',
+            HIGH: 'HIGH',
+            MODERATE: 'MEDIUM',
+            MEDIUM: 'MEDIUM',
+            LOW: 'LOW'
+          }[String(impact.riskLevel || '').toUpperCase()] || 'LOW';
+        const baseByRisk = { HIGH: 85, MEDIUM: 55, LOW: 20 };
+        const impactScore = Math.min(
+          99,
+          Math.max(
+            1,
+            Math.round((baseByRisk[canonBand] || 20) + (impact.overlappingLeaves || 0) * 3)
+          )
+        );
+        const riskMap = { HIGH: 'critical', MEDIUM: 'moderate', LOW: 'low' };
+        return {
+          ...l,
+          impactScore,
+          impactRisk: riskMap[canonBand] || 'low',
+          overlapCount: impact.overlappingLeaves || 0,
+          projectedCoverage: impact.projectedCoverage,
+          backupAssigned: null
+        };
+      } catch (e) {
+        return { ...l, impactScore: null, impactRisk: 'unknown', overlapCount: 0 };
+      }
+    })
+  );
+};
+
 module.exports = {
   createLeaveRequest,
   getMeLeaves,
+  getLeaveBalance,
   getAllLeaves,
   getLeaveById,
   approveLeave,
-  rejectLeave
+  rejectLeave,
+  getPendingLeavesWithImpact
 };

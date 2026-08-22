@@ -54,9 +54,50 @@ const getTeamAttendance = async (req, res, next) => {
 const getTodayAttendance = async (req, res, next) => {
   try {
     const { date } = req.query;
+
+    // Admins get the organization-wide list; employees get their own day widget data.
+    if (req.user.role === 'ADMIN') {
+      const data = await attendanceService.getTodayAttendance(date);
+      return sendSuccess(res, data, 200);
+    }
+
+    const data = await attendanceService.getMeToday(req.user.employeeId, date);
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAllAttendance = async (req, res, next) => {
+  try {
+    const { date } = req.query;
     const data = await attendanceService.getTodayAttendance(date);
     return sendSuccess(res, data, 200);
   } catch (error) {
+    next(error);
+  }
+};
+
+const markManual = async (req, res, next) => {
+  try {
+    const { employeeId, date, status, checkIn, checkOut } = req.body;
+
+    if (!employeeId) {
+      return sendError(res, 'employeeId is required.', 'VALIDATION_ERROR', 400);
+    }
+
+    const data = await attendanceService.markManualAttendance({
+      employeeId,
+      dateStr: date,
+      status,
+      checkIn,
+      checkOut
+    });
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    if (error.code === 'NOT_FOUND') {
+      return sendError(res, error.message, error.code, 404);
+    }
     next(error);
   }
 };
@@ -66,5 +107,7 @@ module.exports = {
   checkOut,
   getMeAttendance,
   getTeamAttendance,
-  getTodayAttendance
+  getTodayAttendance,
+  getAllAttendance,
+  markManual
 };

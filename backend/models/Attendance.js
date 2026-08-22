@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { ATTENDANCE_STATUS } = require('../utils/constants');
+const { mapAttendanceStatus } = require('../utils/dialect');
 
 const attendanceSchema = new mongoose.Schema(
   {
@@ -38,6 +39,7 @@ const attendanceSchema = new mongoose.Schema(
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;
+        ret.status = mapAttendanceStatus(ret.status);
         delete ret._id;
         delete ret.__v;
         return ret;

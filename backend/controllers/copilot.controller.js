@@ -25,7 +25,17 @@ const getSuggestedPrompts = async (req, res, next) => {
   }
 };
 
+const getConversations = async (req, res, next) => {
+  try {
+    // Conversation persistence is on the roadmap; return empty history for now.
+    return sendSuccess(res, { conversations: [] }, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   askCopilot,
-  getSuggestedPrompts
+  getSuggestedPrompts,
+  getConversations
 };

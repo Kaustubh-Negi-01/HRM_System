@@ -57,10 +57,20 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        const error = new Error(data?.message || `Request failed with status ${response.status}`);
+        // Backend error envelope: { success:false, error:{ code, message } }
+        const message =
+          data?.error?.message || data?.message || `Request failed with status ${response.status}`;
+        const error = new Error(message);
         error.status = response.status;
+        error.code = data?.error?.code;
         error.data = data;
         throw error;
+      }
+
+      // Unwrap the backend success envelope { success:true, data } so services
+      // receive the payload directly.
+      if (data && typeof data === 'object' && data.success === true && 'data' in data) {
+        return data.data;
       }
 
       return data;

@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken');
+﻿const jwt = require('jsonwebtoken');
+const { mapRole } = require('../utils/dialect');
 const User = require('../models/User');
 const EmployeeProfile = require('../models/EmployeeProfile');
 const Payroll = require('../models/Payroll');
@@ -9,7 +10,7 @@ const generateToken = (user) => {
     {
       id: user._id,
       employeeId: user.employeeId,
-      role: user.role,
+      role: mapRole(user.role),
       department: user.department
     },
     env.JWT_SECRET,
@@ -68,7 +69,7 @@ const signup = async ({ employeeId, name, email, password, role, department, des
       employeeId: user.employeeId,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: mapRole(user.role),
       department: user.department,
       profile: {
         designation: profile.designation,
@@ -107,7 +108,7 @@ const login = async ({ email, password }) => {
       employeeId: user.employeeId,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: mapRole(user.role),
       department: user.department,
       profile: profile
         ? {
@@ -140,7 +141,7 @@ const getMe = async (userId) => {
     employeeId: user.employeeId,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: mapRole(user.role),
     department: user.department,
     createdAt: user.createdAt,
     profile: profile || null,

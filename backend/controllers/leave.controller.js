@@ -36,6 +36,49 @@ const getMeLeaves = async (req, res, next) => {
   }
 };
 
+const getMyBalance = async (req, res, next) => {
+  try {
+    const data = await leaveService.getLeaveBalance(req.user.employeeId);
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getPendingApprovals = async (req, res, next) => {
+  try {
+    const data = await leaveService.getPendingLeavesWithImpact();
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateLeaveStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, notes, comment } = req.body;
+    const normalized = String(status || '').toLowerCase();
+    const text = notes !== undefined ? notes : comment;
+
+    if (!['approved', 'rejected'].includes(normalized)) {
+      return sendError(res, "status must be 'approved' or 'rejected'.", 'VALIDATION_ERROR', 400);
+    }
+
+    const data =
+      normalized === 'approved'
+        ? await leaveService.approveLeave(id, req.user, text)
+        : await leaveService.rejectLeave(id, req.user, text);
+
+    return sendSuccess(res, data, 200);
+  } catch (error) {
+    if (error.code === 'NOT_FOUND') {
+      return sendError(res, error.message, error.code, 404);
+    }
+    next(error);
+  }
+};
+
 const getAllLeaves = async (req, res, next) => {
   try {
     const { status, department } = req.query;
@@ -96,8 +139,11 @@ const rejectLeave = async (req, res, next) => {
 module.exports = {
   createLeave,
   getMeLeaves,
+  getMyBalance,
+  getPendingApprovals,
   getAllLeaves,
   getLeaveById,
   approveLeave,
-  rejectLeave
+  rejectLeave,
+  updateLeaveStatus
 };

@@ -219,110 +219,59 @@ const seedDatabase = async () => {
       await Payroll.create(p); // trigger pre-save hook for netSalary
     }
 
-    // 4. Create Historical Attendance (Past 7 days up to today)
+    // 4. Create Historical Attendance (Past 30 days up to today)
     console.log('[Seed] Creating attendance history...');
     const today = new Date();
     const attendanceRecords = [];
 
-    for (let dayOffset = 6; dayOffset >= 0; dayOffset--) {
+    for (let dayOffset = 29; dayOffset >= 0; dayOffset--) {
       const d = new Date(today);
       d.setDate(d.getDate() - dayOffset);
       const dateStr = formatDate(d);
+      const dow = d.getDay(); // 0=Sun, 6=Sat
+      if (dow === 0 || dow === 6) continue; // skip weekends
 
-      // Engineering team
-      attendanceRecords.push({
-        employeeId: 'EMP001',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:02:00Z`),
-        checkOut: new Date(`${dateStr}T17:35:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: 8.5
+      // Deterministic variety patterns (stable demo data)
+      const isLateDay = (emp, off) => (emp + off) % 9 === 0;
+      const isAbsentDay = (emp, off) => (emp * 7 + off) % 13 === 0;
+      const isOvertimeDay = (emp, off) => (emp + off) % 6 === 0;
+
+      const mkRecord = (empId, inHour, inMin, outHour, outMin) => {
+        const checkIn = new Date(`${dateStr}T${String(inHour).padStart(2, '0')}:${String(inMin).padStart(2, '0')}:00Z`);
+        const checkOut = new Date(`${dateStr}T${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}:00Z`);
+        const hours = Number(Math.max(0, (checkOut - checkIn) / 3600000).toFixed(2));
+        return { employeeId: empId, date: dateStr, checkIn, checkOut, status: ATTENDANCE_STATUS.PRESENT, workHours: hours };
+      };
+
+      // Engineering team (EMP001-003)
+      [1, 2, 3].forEach((n) => {
+        if (isAbsentDay(n, dayOffset)) {
+          attendanceRecords.push({ employeeId: `EMP00${n}`, date: dateStr, checkIn: null, checkOut: null, status: ATTENDANCE_STATUS.ABSENT, workHours: 0 });
+          return;
+        }
+        const late = isLateDay(n, dayOffset);
+        const overtime = isOvertimeDay(n, dayOffset);
+        attendanceRecords.push(mkRecord(`EMP00${n}`, late ? 10 : 9, late ? 25 : n, overtime ? 21 : 17, overtime ? 30 : 35));
       });
 
-      attendanceRecords.push({
-        employeeId: 'EMP002',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:15:00Z`),
-        checkOut: new Date(`${dateStr}T17:45:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: 8.5
+      // Support team (EMP004-006)
+      [4, 5, 6].forEach((n) => {
+        if (isAbsentDay(n, dayOffset)) {
+          attendanceRecords.push({ employeeId: `EMP00${n}`, date: dateStr, checkIn: null, checkOut: null, status: ATTENDANCE_STATUS.ABSENT, workHours: 0 });
+          return;
+        }
+        const late = isLateDay(n, dayOffset);
+        attendanceRecords.push(mkRecord(`EMP00${n}`, late ? 9 : 8, late ? 40 : 55, 17, 30));
       });
 
-      attendanceRecords.push({
-        employeeId: 'EMP003',
-        date: dateStr,
-        checkIn: dayOffset === 2 ? null : new Date(`${dateStr}T09:30:00Z`),
-        checkOut: dayOffset === 2 ? null : new Date(`${dateStr}T18:00:00Z`),
-        status: dayOffset === 2 ? ATTENDANCE_STATUS.ABSENT : ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 2 ? 0 : 8.5
-      });
-
-      // Support team (David Kim on approved leave recent 3 days)
-      if (dayOffset <= 2) {
-        attendanceRecords.push({
-          employeeId: 'EMP005',
-          date: dateStr,
-          checkIn: null,
-          checkOut: null,
-          status: ATTENDANCE_STATUS.LEAVE,
-          workHours: 0
-        });
-      } else {
-        attendanceRecords.push({
-          employeeId: 'EMP005',
-          date: dateStr,
-          checkIn: new Date(`${dateStr}T08:50:00Z`),
-          checkOut: new Date(`${dateStr}T17:00:00Z`),
-          status: ATTENDANCE_STATUS.PRESENT,
-          workHours: 8.1
-        });
-      }
-
-      attendanceRecords.push({
-        employeeId: 'EMP004',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:05:00Z`),
-        checkOut: dayOffset === 0 ? null : new Date(`${dateStr}T17:30:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 0 ? 0 : 8.4
-      });
-
-      attendanceRecords.push({
-        employeeId: 'EMP006',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T08:55:00Z`),
-        checkOut: dayOffset === 0 ? null : new Date(`${dateStr}T17:15:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 0 ? 0 : 8.3
-      });
-
-      // Human Resources team
-      attendanceRecords.push({
-        employeeId: 'EMP007',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:00:00Z`),
-        checkOut: dayOffset === 0 ? null : new Date(`${dateStr}T17:00:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 0 ? 0 : 8.0
-      });
-
-      // Product team
-      attendanceRecords.push({
-        employeeId: 'EMP008',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:20:00Z`),
-        checkOut: dayOffset === 0 ? null : new Date(`${dateStr}T17:50:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 0 ? 0 : 8.5
-      });
-
-      attendanceRecords.push({
-        employeeId: 'EMP009',
-        date: dateStr,
-        checkIn: new Date(`${dateStr}T09:10:00Z`),
-        checkOut: dayOffset === 0 ? null : new Date(`${dateStr}T17:40:00Z`),
-        status: ATTENDANCE_STATUS.PRESENT,
-        workHours: dayOffset === 0 ? 0 : 8.5
+      // HR (EMP007) and Product (EMP008-009)
+      [7, 8, 9].forEach((n) => {
+        if (isAbsentDay(n, dayOffset)) {
+          attendanceRecords.push({ employeeId: `EMP00${n}`, date: dateStr, checkIn: null, checkOut: null, status: ATTENDANCE_STATUS.ABSENT, workHours: 0 });
+          return;
+        }
+        const overtime = isOvertimeDay(n, dayOffset);
+        attendanceRecords.push(mkRecord(`EMP00${n}`, 9, 5 + n, overtime ? 19 : 17, overtime ? 45 : 15));
       });
     }
 

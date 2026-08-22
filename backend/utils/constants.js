@@ -11,10 +11,24 @@ const ATTENDANCE_STATUS = {
  };
 
 const LEAVE_TYPE = {
-  PAID: 'PAID',
+  PAID: 'PAID',       // canonical name for Annual / Paid Leave
+  ANNUAL: 'ANNUAL',   // alias accepted from frontend
   SICK: 'SICK',
+  CASUAL: 'CASUAL',
+  MATERNITY: 'MATERNITY',
+  PATERNITY: 'PATERNITY',
   UNPAID: 'UNPAID'
- };
+};
+
+// Annual entitlement (days/year) per leave type, keyed by frontend dialect
+const LEAVE_BALANCE_DEFAULTS = {
+  annual: { total: 20 },
+  sick: { total: 10 },
+  casual: { total: 8 },
+  maternity: { total: 90 },
+  paternity: { total: 15 },
+  unpaid: { total: null } // unlimited, always counts against salary
+};
 
 const LEAVE_STATUS = {
   PENDING: 'PENDING',
@@ -33,5 +47,6 @@ module.exports = {
   ATTENDANCE_STATUS,
   LEAVE_TYPE,
   LEAVE_STATUS,
-  RISK_LEVEL
-};
+  RISK_LEVEL,
+  LEAVE_BALANCE_DEFAULTS
+ };

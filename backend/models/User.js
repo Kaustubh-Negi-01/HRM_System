@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const { ROLES } = require('../utils/constants');
+const { mapRole } = require('../utils/dialect');
 
 const userSchema = new mongoose.Schema(
   {
@@ -44,6 +45,7 @@ const userSchema = new mongoose.Schema(
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;
+        ret.role = mapRole(ret.role);
         delete ret._id;
         delete ret.__v;
         delete ret.passwordHash;

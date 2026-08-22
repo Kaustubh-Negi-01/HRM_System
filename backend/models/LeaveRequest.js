@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { LEAVE_TYPE, LEAVE_STATUS } = require('../utils/constants');
+const { mapLeaveStatus, mapLeaveType } = require('../utils/dialect');
 
 const leaveRequestSchema = new mongoose.Schema(
   {
@@ -53,6 +54,8 @@ const leaveRequestSchema = new mongoose.Schema(
     toJSON: {
       transform(doc, ret) {
         ret.id = ret._id;
+        ret.status = mapLeaveStatus(ret.status);
+        ret.leaveType = mapLeaveType(ret.leaveType);
         delete ret._id;
         delete ret.__v;
         return ret;

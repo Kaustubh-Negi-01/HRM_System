@@ -18,11 +18,24 @@ const copilotRoutes = require('./routes/copilot.routes');
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: '*', // Allow requests during local development
-  credentials: true
-}));
+// Middleware — allow the Vite dev origins; wildcard+credentials is invalid per spec
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173'
+];
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow same-origin/no-origin (curl, mobile apps, proxied requests)
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(null, true); // hackathon mode: permissive
+    },
+    credentials: true
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
