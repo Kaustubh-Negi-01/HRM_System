@@ -6,6 +6,11 @@
 
 **An intelligent, proactive Human Resource Management & Decision-Support System with Real-Time Staffing Intelligence, AI Copilot, and Departmental Budget Planning.**
 
+### 🚀 **[Live Production Deployment (Vercel)](https://humanresourcemanagement-theta.vercel.app)**
+👉 **Direct Admin Portal**: **[https://humanresourcemanagement-theta.vercel.app/admin](https://humanresourcemanagement-theta.vercel.app/admin)**  
+👉 **Direct Employee Portal**: **[https://humanresourcemanagement-theta.vercel.app/employee](https://humanresourcemanagement-theta.vercel.app/employee)**
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel_Production-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://humanresourcemanagement-theta.vercel.app)
 [![Repository](https://img.shields.io/badge/GitHub-saksham--2x7%2Fhumanresourcemanagement-38BDF8?style=for-the-badge&logo=github)](https://github.com/saksham-2x7/humanresourcemanagement)
 [![Database](https://img.shields.io/badge/Supabase-Cloud_PostgreSQL-10B981?style=for-the-badge&logo=supabase)](https://supabase.com)
 [![AI Engine](https://img.shields.io/badge/Google_Gemini-HR_Copilot-0284C7?style=for-the-badge&logo=google)](https://ai.google.dev)
@@ -54,13 +59,14 @@ A live visual telemetry feed of organizational vitality:
 * **Proactive Burnout Alerts**: Automatic detection when team overtime crosses critical thresholds.
 * **Capacity Indicators**: Visual breakdown of operational bandwidth across Engineering, Customer Support, Product, Marketing, and HR.
 * **7-Day Rolling Trend**: Interactive visual chart showing attendance consistency.
+* **Employee Sentiment & eNPS**: Live eNPS score (`+64`) with 91.4% retention stability index.
 
 ### 2. 🔮 Smart Leave Impact™ (`/admin/leave-impact`)
 Predictive decision-support engine for time-off requests:
 * **Coverage Simulation**: Visualizes Current Team Coverage vs. Projected Coverage after approval.
 * **Concurrent Absence Radar**: Highlights overlapping leave requests among members in the same department.
 * **Deterministic Risk Classifier**: Categorizes risk (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) using mathematical staffing thresholds rather than vague guesswork.
-* **One-Click Mitigation**: Approve or reject with structured audit rationale logged to the cloud.
+* **One-Click Mitigation & AI Safe-Approve**: Instant approval with structured audit rationale logged to the cloud.
 
 ### 3. 🤖 AI HR Copilot (`/admin/copilot`)
 Natural-language intelligence engine powered by Google Gemini and database telemetry:
@@ -88,6 +94,7 @@ Real-time employee execution and attendance console:
 * **Quick Demo Personas**: 1-click switcher between Admin (Saksham Singh), Engineering Lead (Alex Chen), and Support Manager (Priya Sharma).
 * **Forgot Password Recovery**: Interactive password reset modal with instant database credential updates.
 * **Session Persistence**: Sessions survive hard reloads (`Cmd+Shift+R` / `F5`) seamlessly.
+* **Global Command Palette**: Instant `Cmd + K` navigation and shortcut engine.
 
 ---
 
@@ -95,9 +102,9 @@ Real-time employee execution and attendance console:
 
 | Role | Name | Email | Default Password | Workspace Route |
 |---|---|---|---|---|
-| **Admin / HR Director** | Saksham Singh | `admin@dayflow.internal` | `Password123!` | `/admin` |
-| **Lead Engineer** | Alex Chen | `alex.chen@dayflow.internal` | `Password123!` | `/employee` |
-| **Support Manager** | Priya Sharma | `priya.sharma@dayflow.internal` | `Password123!` | `/employee` |
+| **Admin / HR Director** | Saksham Singh | `admin@dayflow.internal` | `Password123!` | [`/admin`](https://humanresourcemanagement-theta.vercel.app/admin) |
+| **Lead Engineer** | Alex Chen | `alex.chen@dayflow.internal` | `Password123!` | [`/employee`](https://humanresourcemanagement-theta.vercel.app/employee) |
+| **Support Manager** | Priya Sharma | `priya.sharma@dayflow.internal` | `Password123!` | [`/employee`](https://humanresourcemanagement-theta.vercel.app/employee) |
 
 *(You can also click **"Continue with Google"** on the login page for instant 1-click access!)*
 
@@ -123,7 +130,7 @@ npm start
 ```
 
 ### 4. Open in Browser
-Visit **[http://localhost:3000](http://localhost:3000)** to enter DayFlow OS!
+Visit **[http://localhost:3000](http://localhost:3000)** or use the live deployment at **[https://humanresourcemanagement-theta.vercel.app](https://humanresourcemanagement-theta.vercel.app)**!
 
 ---
 
@@ -141,7 +148,7 @@ humanresourcemanagement/
 ├── frontend/                 # Vite + React 18 SPA (Port 3000)
 │   ├── src/
 │   │   ├── api/              # Supabase client & Axios configuration
-│   │   ├── components/       # UI system (Cards, Modals, Tables, Buttons, Avatars, Topbar, Sidebar)
+│   │   ├── components/       # UI system (Cards, Modals, Tables, Buttons, Avatars, Topbar, Sidebar, CommandPalette)
 │   │   ├── features/         # Service layers (auth, employee, attendance, leave, payroll, workforce)
 │   │   ├── pages/admin/      # Admin Command Center, Pulse, Leave Impact, Copilot, Payroll & Budget
 │   │   ├── pages/employee/   # Employee Workspace, Live Punch Clock, Sprint Tasks, Payslips, Profile
