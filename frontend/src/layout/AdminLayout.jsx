@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,10 +9,10 @@ import {
   Activity,
   Sparkles,
   Bot,
-  Palette,
 } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
+import CommandPalette from '../components/layout/CommandPalette';
 import { useAuth } from '../hooks/useAuth';
 import './AdminLayout.css';
 
@@ -37,7 +37,7 @@ const ADMIN_NAV_SECTIONS = [
   {
     title: 'MANAGEMENT',
     items: [
-      { label: 'Payroll', to: '/admin/payroll', icon: <CreditCard size={18} /> },
+      { label: 'Payroll & Budget', to: '/admin/payroll', icon: <CreditCard size={18} /> },
     ],
   },
 ];
@@ -55,8 +55,15 @@ export const AdminLayout = ({
     title: 'HR Director',
   };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const handleOpenCmd = () => setIsCommandOpen(true);
+    window.addEventListener('dayflow_open_command_palette', handleOpenCmd);
+    return () => window.removeEventListener('dayflow_open_command_palette', handleOpenCmd);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -88,6 +95,7 @@ export const AdminLayout = ({
           user={activeUser}
           breadcrumbs={breadcrumbs}
           onMenuClick={() => setIsSidebarOpen(true)}
+          onSearch={() => setIsCommandOpen(true)}
           onLogout={handleLogout}
         />
         
@@ -95,6 +103,8 @@ export const AdminLayout = ({
           <Outlet />
         </div>
       </div>
+
+      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
     </div>
   );
 };

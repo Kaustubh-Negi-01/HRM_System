@@ -20,6 +20,9 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
+  Smile,
+  HeartHandshake,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const WorkforcePulse = () => {
@@ -39,7 +42,9 @@ export const WorkforcePulse = () => {
         workforceService.getBurnoutRisks(),
       ]);
       setPulse(pulseData);
-      setBurnoutList(burnoutData);
+      setBurnoutList(Array.isArray(burnoutData) ? burnoutData : []);
+    } catch {
+      setBurnoutList([]);
     } finally {
       setLoading(false);
     }
@@ -51,10 +56,10 @@ export const WorkforcePulse = () => {
       key: 'employeeName',
       render: (_, row) => (
         <div className="flex items-center gap-3">
-          <EmployeeAvatar name={row.employeeName} size="md" />
+          <EmployeeAvatar name={row?.employeeName || 'Staff'} size="md" />
           <div>
-            <p className="text-xs font-bold text-primary">{row.employeeName}</p>
-            <p className="text-xs text-muted" style={{ fontSize: '0.6875rem' }}>{row.role} • {row.department}</p>
+            <p className="text-xs font-bold text-primary">{row?.employeeName || 'Staff'}</p>
+            <p className="text-xs text-muted" style={{ fontSize: '0.6875rem' }}>{row?.role || 'Staff'} • {row?.department || 'Engineering'}</p>
           </div>
         </div>
       ),
@@ -68,21 +73,21 @@ export const WorkforcePulse = () => {
             style={{
               width: '42px',
               height: '6px',
-              backgroundColor: 'rgba(30, 41, 59, 0.6)',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
               borderRadius: '999px',
               overflow: 'hidden',
             }}
           >
             <div
               style={{
-                width: `${val}%`,
+                width: `${val || 40}%`,
                 height: '100%',
-                backgroundColor: val > 80 ? 'var(--danger)' : 'var(--warning)',
+                backgroundColor: (val || 0) > 80 ? 'var(--danger)' : 'var(--warning)',
               }}
             />
           </div>
-          <span className="text-xs font-bold font-mono" style={{ color: val > 80 ? 'var(--danger)' : 'var(--warning)' }}>
-            {val}%
+          <span className="text-xs font-bold font-mono" style={{ color: (val || 0) > 80 ? 'var(--danger)' : 'var(--warning)' }}>
+            {val || 40}%
           </span>
         </div>
       ),
@@ -92,25 +97,25 @@ export const WorkforcePulse = () => {
       key: 'overtimeHours',
       render: (val) => (
         <span className="text-xs font-mono font-bold text-rose">
-          {val} hrs
+          {val || 0} hrs
         </span>
       ),
     },
     {
-      header: 'Streak Without Rest',
-      key: 'consecutiveDaysWithoutBreak',
+      header: 'Consecutive Shifts',
+      key: 'streakWithoutRest',
       render: (val) => (
-        <span className="text-xs text-primary font-semibold">
-          {val} consecutive days
+        <span className="text-xs text-muted font-mono">
+          {val || 1} days
         </span>
       ),
     },
     {
-      header: 'AI Diagnostics',
-      key: 'flaggedReason',
+      header: 'Suggested Intervention',
+      key: 'recommendation',
       render: (val) => (
-        <span className="text-xs text-secondary" style={{ maxWidth: '280px', display: 'inline-block' }}>
-          {val}
+        <span className="text-xs text-primary font-medium">
+          {val || 'Encourage comp-off recovery day'}
         </span>
       ),
     },
@@ -118,7 +123,7 @@ export const WorkforcePulse = () => {
 
   return (
     <PageContainer
-      title="Workforce Pulse™ Analytics"
+      title="Workforce Pulse™ Telemetry & Health Radar"
       subtitle="Continuous real-time organizational health monitoring, burnout radar, and retention intelligence."
       action={
         <div className="flex items-center gap-2">
@@ -134,7 +139,7 @@ export const WorkforcePulse = () => {
           padding: '2rem',
           borderRadius: 'var(--radius-xl)',
           marginBottom: '2rem',
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(6, 182, 212, 0.08) 50%, rgba(99, 102, 241, 0.12) 100%)',
+          backgroundColor: '#0A0A0F',
           border: '1px solid rgba(6, 182, 212, 0.3)',
           boxShadow: 'var(--shadow-glow-cyan)',
         }}
@@ -151,8 +156,8 @@ export const WorkforcePulse = () => {
               Organizational Health is at <span className="text-cyan">88% (Optimal)</span>
             </h2>
             <p className="text-sm text-secondary" style={{ marginTop: '0.5rem', lineHeight: 1.6 }}>
-              Telemetry aggregated from 52 employee timesheets, sprint velocities, and leave patterns.
-              Engineering requires intervention due to post-launch overtime strain.
+              Telemetry aggregated from 48 verified employee timesheets, sprint velocities, and leave patterns.
+              Customer Support requires proactive intervention due to elevated ticket volume.
             </p>
           </div>
 
@@ -165,7 +170,7 @@ export const WorkforcePulse = () => {
               width: '120px',
               height: '120px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(15, 23, 42, 0.8) 70%)',
+              backgroundColor: '#040407',
               border: '3px solid var(--pulse-cyan)',
               boxShadow: '0 0 30px rgba(6, 182, 212, 0.35)',
               flexShrink: 0,
@@ -183,6 +188,51 @@ export const WorkforcePulse = () => {
         </div>
       </div>
 
+      {/* Employee Sentiment & eNPS Radar */}
+      <div className="grid grid-cols-3 gap-4" style={{ marginBottom: '2rem' }}>
+        <Card>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted uppercase">Employee NPS (eNPS)</span>
+            <Smile size={18} style={{ color: 'var(--success)' }} />
+          </div>
+          <div className="flex items-baseline gap-2" style={{ marginTop: '0.5rem' }}>
+            <span className="text-3xl font-black text-emerald font-mono">+64</span>
+            <span className="text-xs text-muted">Top 10% Benchmark</span>
+          </div>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.5rem' }}>
+            86% Promoters across 48 survey respondents this quarter.
+          </p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted uppercase">Retention Stability</span>
+            <ShieldCheck size={18} style={{ color: 'var(--primary)' }} />
+          </div>
+          <div className="flex items-baseline gap-2" style={{ marginTop: '0.5rem' }}>
+            <span className="text-3xl font-black text-primary font-mono">91.4%</span>
+            <span className="text-xs text-muted">Low Flight Risk</span>
+          </div>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.5rem' }}>
+            Predicted annualized retention rate based on satisfaction telemetry.
+          </p>
+        </Card>
+
+        <Card>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-muted uppercase">Workload Manageability</span>
+            <HeartHandshake size={18} style={{ color: 'var(--pulse-cyan)' }} />
+          </div>
+          <div className="flex items-baseline gap-2" style={{ marginTop: '0.5rem' }}>
+            <span className="text-3xl font-black text-cyan font-mono">84.0%</span>
+            <span className="text-xs text-muted">Balanced Capacity</span>
+          </div>
+          <p className="text-xs text-secondary" style={{ marginTop: '0.5rem' }}>
+            Engineering post-sprint recovery initiatives active.
+          </p>
+        </Card>
+      </div>
+
       {/* Department Vitality Breakdown Cards */}
       <div style={{ marginBottom: '2rem' }}>
         <h3 className="text-base font-bold text-primary" style={{ marginBottom: '1rem' }}>
@@ -190,11 +240,11 @@ export const WorkforcePulse = () => {
         </h3>
         <div className="grid grid-cols-3 gap-4">
           {(pulse?.departmentHealth || [
-            { name: 'Engineering', headcount: 22, healthScore: 82, burnoutRisk: 'High', avgOvertime: 5.8, status: 'warning' },
+            { name: 'Engineering', headcount: 24, healthScore: 82, burnoutRisk: 'High', avgOvertime: 5.8, status: 'warning' },
             { name: 'Product & Design', headcount: 8, healthScore: 94, burnoutRisk: 'Low', avgOvertime: 1.2, status: 'optimal' },
-            { name: 'Human Resources', headcount: 5, healthScore: 96, burnoutRisk: 'Low', avgOvertime: 0.8, status: 'optimal' },
-            { name: 'Sales & Growth', headcount: 11, healthScore: 86, burnoutRisk: 'Moderate', avgOvertime: 4.1, status: 'optimal' },
-            { name: 'Customer Support', headcount: 6, healthScore: 78, burnoutRisk: 'High', avgOvertime: 6.2, status: 'danger' },
+            { name: 'Human Resources', headcount: 3, healthScore: 96, burnoutRisk: 'Low', avgOvertime: 0.8, status: 'optimal' },
+            { name: 'Marketing & Growth', headcount: 5, healthScore: 86, burnoutRisk: 'Moderate', avgOvertime: 4.1, status: 'optimal' },
+            { name: 'Customer Support', headcount: 12, healthScore: 78, burnoutRisk: 'High', avgOvertime: 6.2, status: 'danger' },
           ]).map((dept, idx) => (
             <Card key={idx} variant={dept.status === 'danger' ? 'bordered' : 'default'}>
               <div className="flex items-center justify-between">
@@ -206,7 +256,7 @@ export const WorkforcePulse = () => {
                 <span className="text-xs text-muted">/100 Score</span>
               </div>
 
-              <div className="flex flex-col gap-2 text-xs text-secondary" style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
+              <div className="flex flex-col gap-2 text-xs text-secondary" style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
                 <div className="flex justify-between">
                   <span>Headcount:</span>
                   <span className="text-primary font-semibold">{dept.headcount} active</span>
@@ -247,54 +297,46 @@ export const WorkforcePulse = () => {
           {(pulse?.alerts || [
             {
               id: '1',
-              title: 'Critical Overtime Anomaly: Engineering Squad',
-              description: 'Backend & DevOps subteams logged 140+ cumulative overtime hours in 14 days following the v2.4 launch.',
-              recommendedAction: 'Rotate on-call schedules & reallocate 2 sprint tickets to next milestone.',
+              title: 'Critical Overtime Anomaly: Customer Support Squad',
+              desc: 'Support leads have averaged 6.2 hours overtime over the past 14 days due to product launch inquiries.',
+              urgency: 'high',
+              action: 'Reallocate 2 part-time rotational engineers to support triage.',
             },
-          ]).map((alert, idx) => (
+            {
+              id: '2',
+              title: 'Healthy Recovery Milestone: Product & Design',
+              desc: 'Team overtime normalized to 1.2h/week following design system milestone completion.',
+              urgency: 'low',
+              action: 'Acknowledge squad sprint cadence during all-hands.',
+            },
+          ]).map((alert) => (
             <div
-              key={alert.id || idx}
-              className="glass-panel"
+              key={alert.id}
               style={{
                 padding: '1.25rem 1.5rem',
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'rgba(15, 23, 42, 0.7)',
-                border: '1px solid var(--border-subtle)',
+                borderRadius: '12px',
+                backgroundColor: '#0A0A0F',
+                border: `1px solid ${alert.urgency === 'high' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '1.25rem',
+                justifyContent: 'space-between',
+                gap: '1rem',
               }}
             >
-              <div style={{ color: 'var(--pulse-cyan)', marginTop: '2px' }}>
-                <Sparkles size={22} />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-sm font-bold text-primary">{alert.title}</h4>
-                <p className="text-xs text-secondary" style={{ marginTop: '0.25rem' }}>
-                  {alert.description}
-                </p>
-                <div
-                  style={{
-                    marginTop: '0.75rem',
-                    padding: '0.625rem 1rem',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'rgba(6, 182, 212, 0.08)',
-                    border: '1px solid rgba(6, 182, 212, 0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <span className="text-xs font-semibold text-cyan">
-                    💡 Recommended Action: {alert.recommendedAction}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => alert(`Applying recommendation: ${alert.recommendedAction}`)}
-                  >
-                    Execute Mitigation
-                  </Button>
+              <div className="flex items-start gap-3">
+                <AlertTriangle
+                  size={18}
+                  style={{ color: alert.urgency === 'high' ? 'var(--danger)' : 'var(--success)', marginTop: 2 }}
+                />
+                <div>
+                  <h4 className="text-sm font-bold text-primary">{alert.title}</h4>
+                  <p className="text-xs text-secondary" style={{ marginTop: '0.25rem', lineHeight: 1.5 }}>
+                    {alert.desc}
+                  </p>
+                  <div className="flex items-center gap-1 text-xs font-semibold text-cyan" style={{ marginTop: '0.5rem' }}>
+                    <Sparkles size={13} />
+                    <span>Recommendation: {alert.action}</span>
+                  </div>
                 </div>
               </div>
             </div>

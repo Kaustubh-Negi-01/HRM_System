@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Sidebar from '../components/layout/Sidebar';
 import Topbar from '../components/layout/Topbar';
+import CommandPalette from '../components/layout/CommandPalette';
 import { useAuth } from '../hooks/useAuth';
 import './EmployeeLayout.css';
 
@@ -37,8 +38,15 @@ export const EmployeeLayout = ({
     title: 'Lead Fullstack Engineer',
   };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const handleOpenCmd = () => setIsCommandOpen(true);
+    window.addEventListener('dayflow_open_command_palette', handleOpenCmd);
+    return () => window.removeEventListener('dayflow_open_command_palette', handleOpenCmd);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -70,13 +78,16 @@ export const EmployeeLayout = ({
           breadcrumbs={breadcrumbs}
           onMenuClick={() => setIsSidebarOpen(true)}
           onLogout={handleLogout}
-          showSearch={false}
+          showSearch={true}
+          onSearch={() => setIsCommandOpen(true)}
         />
         
         <div className="df-employee-content">
           <Outlet />
         </div>
       </div>
+
+      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
     </div>
   );
 };
